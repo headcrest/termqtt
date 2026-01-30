@@ -42,3 +42,37 @@ export const saveJson = async (fileName: string, data: unknown) => {
   const path = join(dir, fileName);
   await Bun.write(path, JSON.stringify(data, null, 2));
 };
+
+export type PersistedState = {
+  broker: unknown;
+  favourites: unknown;
+  watchlist: unknown;
+  savedMessages: unknown;
+  excludeFilters: unknown;
+};
+
+export const loadAll = async <T extends PersistedState>(fallback: T): Promise<T> => {
+  const broker = await loadJson(storageFiles.broker, fallback.broker);
+  const favourites = await loadJson(storageFiles.favourites, fallback.favourites);
+  const watchlist = await loadJson(storageFiles.watchlist, fallback.watchlist);
+  const savedMessages = await loadJson(storageFiles.savedMessages, fallback.savedMessages);
+  const excludeFilters = await loadJson(storageFiles.filters, fallback.excludeFilters);
+  return {
+    ...fallback,
+    broker,
+    favourites,
+    watchlist,
+    savedMessages,
+    excludeFilters,
+  } as T;
+};
+
+export const saveAll = async (data: PersistedState) => {
+  await Promise.all([
+    saveJson(storageFiles.broker, data.broker),
+    saveJson(storageFiles.favourites, data.favourites),
+    saveJson(storageFiles.watchlist, data.watchlist),
+    saveJson(storageFiles.savedMessages, data.savedMessages),
+    saveJson(storageFiles.filters, data.excludeFilters),
+  ]);
+};

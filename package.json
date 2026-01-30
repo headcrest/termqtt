@@ -1,16 +1,21 @@
 {
   "name": "termqtt2",
-  "module": "index.ts",
+  "module": "index.tsx",
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
     "@opentui/core": "^0.1.75",
-    "mqtt": "^5.14.1"
+    "@opentui/react": "^0.1.75",
+    "mqtt": "^5.14.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   }
 }
