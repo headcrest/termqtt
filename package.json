@@ -1,0 +1,16 @@
+{
+  "name": "termqtt2",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.1.75",
+    "mqtt": "^5.14.1"
+  }
+}
