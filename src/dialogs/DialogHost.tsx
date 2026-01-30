@@ -9,7 +9,7 @@ import { MessageDialog } from "./MessageDialog";
 
 type DialogHostProps = {
   state: AppState;
-  visibleTopics: string[];
+  topicPaths: string[];
   onSearch: (value: string) => void;
   onSaveBroker: (broker: BrokerConfig) => void;
   onSaveFilters: (filters: AppState["excludeFilters"]) => void;
@@ -22,7 +22,7 @@ type DialogHostProps = {
 
 export const DialogHost = ({
   state,
-  visibleTopics,
+  topicPaths,
   onSearch,
   onSaveBroker,
   onSaveFilters,
@@ -35,7 +35,7 @@ export const DialogHost = ({
   const { activeDialog } = useDialog();
   if (!activeDialog) return null;
 
-  const selectedTopic = visibleTopics[state.selectedTopicIndex];
+  const selectedTopic = topicPaths[state.selectedTopicIndex];
   const selectedMessage = selectedTopic ? state.messages[selectedTopic] : undefined;
 
   if (activeDialog.type === "search") {

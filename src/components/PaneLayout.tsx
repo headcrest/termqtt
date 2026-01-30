@@ -21,6 +21,7 @@ type PaneLayoutProps = {
   selectedPayloadIndex: number;
   selectedWatchIndex: number;
   onTopicChange: (index: number) => void;
+  onTopicSelect: (index: number) => void;
   onFavouriteChange: (index: number) => void;
   onFavouriteSelect: (index: number) => void;
   onPayloadChange: (index: number) => void;
@@ -44,6 +45,7 @@ export const PaneLayout = ({
   selectedPayloadIndex,
   selectedWatchIndex,
   onTopicChange,
+  onTopicSelect,
   onFavouriteChange,
   onFavouriteSelect,
   onPayloadChange,
@@ -60,6 +62,7 @@ export const PaneLayout = ({
           focused={activePane === "topics"}
           count={topicsCount}
           onChange={onTopicChange}
+          onSelect={onTopicSelect}
         />
         <FavouritesPane
           options={favouritesOptions}

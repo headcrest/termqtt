@@ -15,7 +15,7 @@ const matchTopicFilter = (topic: string, filter: string): boolean => {
   return filterLevels.length === topicLevels.length;
 };
 
-export const getVisibleTopics = (topics: string[], filters: ExcludeFilter[], query: string) => {
+const getFilteredTopics = (topics: string[], filters: ExcludeFilter[], query: string) => {
   const activeFilters = filters.filter((filter) => filter.enabled && filter.pattern.trim().length > 0);
   const lowered = query.toLowerCase();
   return topics.filter((topic) => {
@@ -27,9 +27,60 @@ export const getVisibleTopics = (topics: string[], filters: ExcludeFilter[], que
   });
 };
 
-export const getSelectedMessage = (state: AppState, visibleTopics: string[]) => {
-  const selectedTopic = visibleTopics[state.selectedTopicIndex];
-  return selectedTopic ? state.messages[selectedTopic] : undefined;
+type TopicNode = {
+  name: string;
+  path: string;
+  children: Map<string, TopicNode>;
+};
+
+const buildTopicTree = (topics: string[]) => {
+  const root: TopicNode = { name: "", path: "", children: new Map() };
+  for (const topic of topics) {
+    const parts = topic.split("/").filter((part) => part.length > 0);
+    let node = root;
+    let currentPath = "";
+    for (const part of parts) {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      if (!node.children.has(part)) {
+        node.children.set(part, { name: part, path: currentPath, children: new Map() });
+      }
+      node = node.children.get(part)!;
+    }
+  }
+  return root;
+};
+
+export type TopicEntry = {
+  path: string;
+  label: string;
+  depth: number;
+  hasChildren: boolean;
+};
+
+export const getTopicTreeEntries = (
+  state: AppState,
+): { entries: TopicEntry[]; topicPaths: string[] } => {
+  const filtered = getFilteredTopics(state.topics, state.excludeFilters, state.searchQuery);
+  const tree = buildTopicTree(filtered);
+  const entries: TopicEntry[] = [];
+  const topicPaths: string[] = [];
+
+  const walk = (node: TopicNode, depth: number) => {
+    const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
+    for (const child of children) {
+      const hasChildren = child.children.size > 0;
+      const expanded = state.topicExpansion[child.path] ?? depth === 0;
+      const indent = "  ".repeat(depth);
+      const marker = hasChildren ? (expanded ? "- " : "+ ") : "  ";
+      const label = `${indent}${marker}${child.name}`;
+      entries.push({ path: child.path, label, depth, hasChildren });
+      topicPaths.push(child.path);
+      if (hasChildren && expanded) walk(child, depth + 1);
+    }
+  };
+
+  walk(tree, 0);
+  return { entries, topicPaths };
 };
 
 export const getPayloadEntries = (message?: TopicMessage) => {
@@ -62,13 +113,10 @@ export const getStatusLines = (state: AppState) => {
   const search = state.searchQuery ? `search:${state.searchQuery}` : "search:off";
   const excludes = state.excludeFilters.filter((f) => f.enabled).length;
   const error = state.connectionError ? `error:${state.connectionError}` : "";
-  const lastTopic = state.lastMessageTopic ? `last:${state.lastMessageTopic}` : "last:none";
   const total = `messages:${state.messageCount}`;
-  const sub = state.subscriptionInfo
-    ? `sub:${state.lastSubscription || "-"} ${state.subscriptionInfo}`
-    : `sub:${state.lastSubscription || "-"}`;
   const line1 = `${status}  broker:${host}  filter:${filter}  ${search}`.trim();
-  const line2 = `${total}  ${lastTopic}  ${sub}  excludes:${excludes} ${error}`.trim();
+  const debug = state.debugKeys && state.lastKeyDebug ? `key:${state.lastKeyDebug}` : "";
+  const line2 = `${total}  excludes:${excludes} ${error} ${debug}`.trim();
   return { line1, line2 };
 };
 

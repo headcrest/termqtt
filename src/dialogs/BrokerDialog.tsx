@@ -69,16 +69,18 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      const isShiftTab =
+        key.name === "backtab" || (key.name === "tab" && key.shift) || key.sequence === "\u001b[Z";
       if (key.name === "escape") {
         closeDialog();
         return true;
       }
-      if (key.name === "tab") {
-        setFocusIndex((prev) => (prev + 1) % fields.length);
+      if (isShiftTab) {
+        setFocusIndex((prev) => (prev - 1 + fields.length) % fields.length);
         return true;
       }
-      if (key.shift && key.name === "tab") {
-        setFocusIndex((prev) => (prev - 1 + fields.length) % fields.length);
+      if (key.name === "tab") {
+        setFocusIndex((prev) => (prev + 1) % fields.length);
         return true;
       }
       if (key.name === "return") {

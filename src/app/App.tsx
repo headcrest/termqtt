@@ -11,9 +11,8 @@ import { reducer } from "./reducer";
 import {
   getDetailsText,
   getPayloadEntries,
-  getSelectedMessage,
   getStatusLines,
-  getVisibleTopics,
+  getTopicTreeEntries,
   getWatchOptions,
 } from "./selectors";
 import {
@@ -31,31 +30,31 @@ const AppContent = () => {
 
   usePersistence(state, dispatch);
 
-  const visibleTopics = useMemo(
-    () => getVisibleTopics(state.topics, state.excludeFilters, state.searchQuery),
-    [state.topics, state.excludeFilters, state.searchQuery],
-  );
-
-  const selectedMessage = useMemo(
-    () => getSelectedMessage(state, visibleTopics),
-    [state, visibleTopics],
-  );
+  const topicTree = useMemo(() => getTopicTreeEntries(state), [state]);
+  const selectedTopicPath = topicTree.topicPaths[state.selectedTopicIndex];
+  const selectedMessage = selectedTopicPath ? state.messages[selectedTopicPath] : undefined;
 
   const payloadEntries = useMemo(() => getPayloadEntries(selectedMessage), [selectedMessage]);
   const watchOptions = useMemo(() => getWatchOptions(state), [state]);
   const detailsText = useMemo(() => getDetailsText(selectedMessage), [selectedMessage]);
   const statusLines = useMemo(() => getStatusLines(state), [state]);
 
-  useKeyboardShortcuts({ state, dispatch, visibleTopics, payloadEntries });
+  useKeyboardShortcuts({
+    state,
+    dispatch,
+    topicEntries: topicTree.entries,
+    topicPaths: topicTree.topicPaths,
+    payloadEntries,
+  });
 
   useEffect(() => {
-    if (state.selectedTopicIndex >= visibleTopics.length) {
+    if (state.selectedTopicIndex >= topicTree.entries.length) {
       dispatch({
         type: "set",
-        data: { selectedTopicIndex: Math.max(0, visibleTopics.length - 1) },
+        data: { selectedTopicIndex: Math.max(0, topicTree.entries.length - 1) },
       });
     }
-  }, [state.selectedTopicIndex, visibleTopics.length]);
+  }, [state.selectedTopicIndex, topicTree.entries.length]);
 
   useEffect(() => {
     if (state.selectedFavouriteIndex >= state.favourites.length) {
@@ -85,8 +84,8 @@ const AppContent = () => {
   }, [state.selectedWatchIndex, watchOptions.length]);
 
   const topicsOptions: SelectOption[] = useMemo(
-    () => visibleTopics.map((topic) => ({ name: topic, description: "" })),
-    [visibleTopics],
+    () => topicTree.entries.map((entry) => ({ name: entry.label, description: "" })),
+    [topicTree.entries],
   );
 
   const favouritesOptions: SelectOption[] = useMemo(
@@ -106,12 +105,24 @@ const AppContent = () => {
   const handleFavouriteSelect = (index: number) => {
     const fav = state.favourites[index];
     if (!fav) return;
-    const topicIndex = visibleTopics.indexOf(fav.topic);
+    const topicIndex = topicTree.topicPaths.indexOf(fav.topic);
     if (topicIndex >= 0) {
       dispatch({ type: "set", data: { selectedTopicIndex: topicIndex, activePane: "topics" } });
     } else {
       dispatch({ type: "set", data: { searchQuery: "", activePane: "topics" } });
     }
+  };
+
+  const handleTopicSelect = (index: number) => {
+    const entry = topicTree.entries[index];
+    if (!entry || !entry.hasChildren) return;
+    const current = state.topicExpansion[entry.path];
+    const defaultExpanded = entry.depth === 0;
+    const next = !(current ?? defaultExpanded);
+    dispatch({
+      type: "set",
+      data: { topicExpansion: { ...state.topicExpansion, [entry.path]: next } },
+    });
   };
 
   const handleRenameFavourite = (value: string) => {
@@ -152,7 +163,7 @@ const AppContent = () => {
         favouritesOptions={favouritesOptions}
         payloadOptions={payloadOptions}
         watchOptions={watchOptions}
-        topicsCount={visibleTopics.length}
+        topicsCount={topicTree.entries.length}
         favouritesCount={state.favourites.length}
         payloadCount={payloadEntries.length}
         watchCount={state.watchlist.length}
@@ -163,6 +174,7 @@ const AppContent = () => {
         onTopicChange={(index) =>
           dispatch({ type: "set", data: { selectedTopicIndex: index, selectedPayloadIndex: 0 } })
         }
+        onTopicSelect={handleTopicSelect}
         onFavouriteChange={(index) => dispatch({ type: "set", data: { selectedFavouriteIndex: index } })}
         onFavouriteSelect={handleFavouriteSelect}
         onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index } })}
@@ -172,7 +184,7 @@ const AppContent = () => {
       />
       <DialogHost
         state={state}
-        visibleTopics={visibleTopics}
+        topicPaths={topicTree.topicPaths}
         onSearch={(value) => dispatch({ type: "set", data: { searchQuery: value } })}
         onSaveBroker={handleSaveBroker}
         onSaveFilters={handleSaveFilters}

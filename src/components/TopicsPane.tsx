@@ -6,16 +6,25 @@ type TopicsPaneProps = {
   focused: boolean;
   count: number;
   onChange: (index: number) => void;
+  onSelect: (index: number) => void;
 };
 
-export const TopicsPane = ({ options, selectedIndex, focused, count, onChange }: TopicsPaneProps) => {
+export const TopicsPane = ({
+  options,
+  selectedIndex,
+  focused,
+  count,
+  onChange,
+  onSelect,
+}: TopicsPaneProps) => {
   return (
-    <box title={`Topics (${count})`} border style={{ flexGrow: 1, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
+    <box title={`1 Topics (${count})`} border style={{ flexGrow: 1, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
       <select
         options={options}
         focused={focused}
         selectedIndex={selectedIndex}
         onChange={(index) => onChange(index)}
+        onSelect={(index) => onSelect(index)}
         showDescription={false}
         selectedBackgroundColor="#2d8cff"
         selectedTextColor="#0b1220"

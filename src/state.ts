@@ -50,6 +50,9 @@ export type AppState = {
   lastMessageAt?: number;
   lastSubscription?: string;
   subscriptionInfo?: string;
+  debugKeys: boolean;
+  lastKeyDebug?: string;
+  topicExpansion: Record<string, boolean>;
   topics: string[];
   messages: Record<string, TopicMessage>;
   favourites: Favourite[];
@@ -82,6 +85,8 @@ export const createInitialState = (): AppState => ({
   broker: createDefaultBrokerConfig(),
   connectionStatus: "disconnected",
   messageCount: 0,
+  debugKeys: false,
+  topicExpansion: {},
   topics: [],
   messages: {},
   favourites: [],

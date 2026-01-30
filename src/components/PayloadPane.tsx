@@ -10,7 +10,7 @@ type PayloadPaneProps = {
 
 export const PayloadPane = ({ options, selectedIndex, focused, count, onChange }: PayloadPaneProps) => {
   return (
-    <box title={`Payload (${count})`} border style={{ flexGrow: 2, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
+    <box title={`2 Payload (${count})`} border style={{ flexGrow: 2, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
       <select
         options={options}
         focused={focused}

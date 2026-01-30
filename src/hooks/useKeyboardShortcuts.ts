@@ -8,20 +8,96 @@ import type { Dispatch } from "react";
 type UseKeyboardShortcutsProps = {
   state: AppState;
   dispatch: Dispatch<Action>;
-  visibleTopics: string[];
+  topicEntries: Array<{ path: string; depth: number; hasChildren: boolean }>;
+  topicPaths: string[];
   payloadEntries: Array<{ path: string; value: unknown }>;
 };
 
 export const useKeyboardShortcuts = ({
   state,
   dispatch,
-  visibleTopics,
+  topicEntries,
+  topicPaths,
   payloadEntries,
 }: UseKeyboardShortcutsProps) => {
   const { activeDialog, openDialog, dialogHandler } = useDialog();
   const renderer = useRenderer();
 
+  const isShiftTab = (key: KeyEvent) => {
+    if (key.name === "backtab") return true;
+    if (key.name === "tab" && key.shift) return true;
+    if (key.name === "teb") return true;
+    if (key.sequence === "\u001b[Z") return true;
+    if (key.sequence && key.sequence.endsWith("[Z")) return true;
+    if (key.sequence === "[") return true;
+    return false;
+  };
+
+  const moveSelection = (direction: "up" | "down") => {
+    const delta = direction === "up" ? -1 : 1;
+    if (state.activePane === "topics") {
+      const next = Math.max(0, Math.min(topicEntries.length - 1, state.selectedTopicIndex + delta));
+      dispatch({ type: "set", data: { selectedTopicIndex: next } });
+    }
+    if (state.activePane === "favourites") {
+      const next = Math.max(0, Math.min(state.favourites.length - 1, state.selectedFavouriteIndex + delta));
+      dispatch({ type: "set", data: { selectedFavouriteIndex: next } });
+    }
+    if (state.activePane === "payload") {
+      const next = Math.max(0, Math.min(payloadEntries.length - 1, state.selectedPayloadIndex + delta));
+      dispatch({ type: "set", data: { selectedPayloadIndex: next } });
+    }
+    if (state.activePane === "watchlist") {
+      const next = Math.max(0, Math.min(state.watchlist.length - 1, state.selectedWatchIndex + delta));
+      dispatch({ type: "set", data: { selectedWatchIndex: next } });
+    }
+  };
+
+  const toggleExpand = (direction: "expand" | "collapse") => {
+    if (state.activePane !== "topics") return;
+    const entry = topicEntries[state.selectedTopicIndex];
+    const path = topicPaths[state.selectedTopicIndex];
+    if (!entry || !path) return;
+    if (entry.hasChildren) {
+      const defaultExpanded = entry.depth === 0;
+      const current = state.topicExpansion[entry.path] ?? defaultExpanded;
+      const next = direction === "expand" ? true : false;
+      if (current === next) return;
+      dispatch({
+        type: "set",
+        data: { topicExpansion: { ...state.topicExpansion, [entry.path]: next } },
+      });
+      return;
+    }
+    if (direction === "collapse") {
+      const parentPath = path.includes("/") ? path.split("/").slice(0, -1).join("/") : "";
+      if (!parentPath) return;
+      dispatch({
+        type: "set",
+        data: { topicExpansion: { ...state.topicExpansion, [parentPath]: false } },
+      });
+    }
+  };
+
   useKeyboard((key: KeyEvent) => {
+    if (key.ctrl && key.name === "g") {
+      dispatch({
+        type: "set",
+        data: {
+          debugKeys: !state.debugKeys,
+          lastKeyDebug: `${key.name ?? ""}:${JSON.stringify(key.sequence ?? "")}`.trim(),
+        },
+      });
+      return;
+    }
+
+    if (state.debugKeys) {
+      dispatch({
+        type: "set",
+        data: { lastKeyDebug: `${key.name ?? ""}:${JSON.stringify(key.sequence ?? "")}`.trim() },
+      });
+    }
+
     if (activeDialog) {
       dialogHandler?.(key);
       return;
@@ -48,40 +124,63 @@ export const useKeyboardShortcuts = ({
       return;
     }
 
-    if (key.name === "h" || key.name === "left") {
-      const columns: AppState["activePane"][][] = [
-        ["topics", "favourites"],
-        ["payload", "watchlist"],
-        ["details"],
-      ];
-      const colIndex = columns.findIndex((col) => col.includes(state.activePane));
-      const next = columns[Math.max(0, colIndex - 1)]?.[0] || "topics";
+    if (isShiftTab(key)) {
+      const order: AppState["activePane"][] = ["topics", "payload", "details", "favourites", "watchlist"];
+      const index = order.indexOf(state.activePane);
+      const next = order[(index - 1 + order.length) % order.length] || "topics";
       dispatch({ type: "set", data: { activePane: next } });
+      return;
+    }
+    if (key.name === "tab") {
+      const order: AppState["activePane"][] = ["topics", "payload", "details", "favourites", "watchlist"];
+      const index = order.indexOf(state.activePane);
+      const next = order[(index + 1) % order.length] || "topics";
+      dispatch({ type: "set", data: { activePane: next } });
+      return;
+    }
+
+    if (key.name === "1") {
+      dispatch({ type: "set", data: { activePane: "topics" } });
+      return;
+    }
+    if (key.name === "2") {
+      dispatch({ type: "set", data: { activePane: "payload" } });
+      return;
+    }
+    if (key.name === "3") {
+      dispatch({ type: "set", data: { activePane: "details" } });
+      return;
+    }
+    if (key.name === "4") {
+      dispatch({ type: "set", data: { activePane: "favourites" } });
+      return;
+    }
+    if (key.name === "5") {
+      dispatch({ type: "set", data: { activePane: "watchlist" } });
+      return;
+    }
+
+    if (key.name === "j" || key.name === "down") {
+      moveSelection("down");
+      return;
+    }
+    if (key.name === "k" || key.name === "up") {
+      moveSelection("up");
+      return;
+    }
+    if (key.name === "h" || key.name === "left") {
+      toggleExpand("collapse");
       return;
     }
     if (key.name === "l" || key.name === "right") {
-      const columns: AppState["activePane"][][] = [
-        ["topics", "favourites"],
-        ["payload", "watchlist"],
-        ["details"],
-      ];
-      const colIndex = columns.findIndex((col) => col.includes(state.activePane));
-      const next = columns[Math.min(columns.length - 1, colIndex + 1)]?.[0] || "details";
-      dispatch({ type: "set", data: { activePane: next } });
+      toggleExpand("expand");
       return;
     }
-    if (key.name === "u") {
-      if (state.activePane === "favourites") dispatch({ type: "set", data: { activePane: "topics" } });
-      if (state.activePane === "watchlist") dispatch({ type: "set", data: { activePane: "payload" } });
-      return;
-    }
+
     if (key.name === "n") {
       if (state.activePane === "details") {
         openDialog({ type: "new" });
-        return;
       }
-      if (state.activePane === "topics") dispatch({ type: "set", data: { activePane: "favourites" } });
-      if (state.activePane === "payload") dispatch({ type: "set", data: { activePane: "watchlist" } });
       return;
     }
     if (key.name === "e" && state.activePane === "details") {
@@ -90,8 +189,9 @@ export const useKeyboardShortcuts = ({
     }
     if (key.name === "space") {
       if (state.activePane === "topics") {
-        const topic = visibleTopics[state.selectedTopicIndex];
-        if (!topic) return;
+        const entry = topicEntries[state.selectedTopicIndex];
+        const topic = topicPaths[state.selectedTopicIndex];
+        if (!entry || !topic || entry.hasChildren) return;
         const exists = state.favourites.find((fav) => fav.topic === topic);
         const favourites = exists
           ? state.favourites.filter((fav) => fav.topic !== topic)
@@ -103,7 +203,7 @@ export const useKeyboardShortcuts = ({
         dispatch({ type: "set", data: { favourites } });
       }
       if (state.activePane === "payload") {
-        const topic = visibleTopics[state.selectedTopicIndex];
+        const topic = topicPaths[state.selectedTopicIndex];
         const entry = payloadEntries[state.selectedPayloadIndex];
         if (!topic || !entry) return;
         const exists = state.watchlist.find((item) => item.topic === topic && item.path === entry.path);

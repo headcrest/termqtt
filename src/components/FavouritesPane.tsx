@@ -18,7 +18,7 @@ export const FavouritesPane = ({
   onSelect,
 }: FavouritesPaneProps) => {
   return (
-    <box title={`Favourites (${count})`} border style={{ flexGrow: 1, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
+    <box title={`4 Favourites (${count})`} border style={{ flexGrow: 1, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
       <select
         options={options}
         focused={focused}
