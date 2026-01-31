@@ -3,6 +3,7 @@ import type { KeyEvent } from "@opentui/core";
 import type { Action } from "../app/reducer";
 import type { AppState } from "../state";
 import { useDialog } from "../dialogs/DialogContext";
+import { getFirstLeafTopicPath, getTopicTreeEntries } from "../app/selectors";
 import type { Dispatch } from "react";
 
 type UseKeyboardShortcutsProps = {
@@ -63,18 +64,67 @@ export const useKeyboardShortcuts = ({
       const current = state.topicExpansion[entry.path] ?? defaultExpanded;
       const next = direction === "expand" ? true : false;
       if (current === next) return;
+      if (!next) {
+        const nextExpansion = { ...state.topicExpansion, [entry.path]: false };
+        const nextTree = getTopicTreeEntries({
+          ...state,
+          topicExpansion: nextExpansion,
+        });
+        const nextIndex = nextTree.topicPaths.indexOf(entry.path);
+        dispatch({
+          type: "set",
+          data: {
+            topicExpansion: nextExpansion,
+            selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
+          },
+        });
+        return;
+      }
+      const leafPath = getFirstLeafTopicPath(state, entry.path);
+      if (!leafPath) {
+        dispatch({
+          type: "set",
+          data: { topicExpansion: { ...state.topicExpansion, [entry.path]: true } },
+        });
+        return;
+      }
+      const nextExpansion = { ...state.topicExpansion };
+      const parts = leafPath.split("/").filter((part) => part.length > 0);
+      let currentPath = "";
+      for (const part of parts) {
+        currentPath = currentPath ? `${currentPath}/${part}` : part;
+        nextExpansion[currentPath] = true;
+        if (currentPath === leafPath) break;
+      }
+      const nextTree = getTopicTreeEntries({
+        ...state,
+        topicExpansion: nextExpansion,
+      });
+      const leafIndex = nextTree.topicPaths.indexOf(leafPath);
       dispatch({
         type: "set",
-        data: { topicExpansion: { ...state.topicExpansion, [entry.path]: next } },
+        data: {
+          topicExpansion: nextExpansion,
+          selectedTopicIndex: leafIndex >= 0 ? leafIndex : state.selectedTopicIndex,
+        },
       });
       return;
     }
     if (direction === "collapse") {
       const parentPath = path.includes("/") ? path.split("/").slice(0, -1).join("/") : "";
       if (!parentPath) return;
+      const nextExpansion = { ...state.topicExpansion, [parentPath]: false };
+      const nextTree = getTopicTreeEntries({
+        ...state,
+        topicExpansion: nextExpansion,
+      });
+      const nextIndex = nextTree.topicPaths.indexOf(parentPath);
       dispatch({
         type: "set",
-        data: { topicExpansion: { ...state.topicExpansion, [parentPath]: false } },
+        data: {
+          topicExpansion: nextExpansion,
+          selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
+        },
       });
     }
   };

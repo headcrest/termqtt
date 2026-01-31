@@ -13,6 +13,7 @@ import {
   getDetailsContent,
   getPayloadEntries,
   getStatusLines,
+  getFirstLeafTopicPath,
   getTopicTreeEntries,
   getWatchOptions,
 } from "./selectors";
@@ -128,9 +129,40 @@ const AppContent = () => {
     const current = state.topicExpansion[entry.path];
     const defaultExpanded = entry.depth === 0;
     const next = !(current ?? defaultExpanded);
+    if (!next) {
+      dispatch({
+        type: "set",
+        data: { topicExpansion: { ...state.topicExpansion, [entry.path]: false } },
+      });
+      return;
+    }
+    const leafPath = getFirstLeafTopicPath(state, entry.path);
+    if (!leafPath) {
+      dispatch({
+        type: "set",
+        data: { topicExpansion: { ...state.topicExpansion, [entry.path]: true } },
+      });
+      return;
+    }
+    const nextExpansion = { ...state.topicExpansion };
+    const parts = leafPath.split("/").filter((part) => part.length > 0);
+    let currentPath = "";
+    for (const part of parts) {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      nextExpansion[currentPath] = true;
+      if (currentPath === leafPath) break;
+    }
+    const nextTree = getTopicTreeEntries({
+      ...state,
+      topicExpansion: nextExpansion,
+    });
+    const leafIndex = nextTree.topicPaths.indexOf(leafPath);
     dispatch({
       type: "set",
-      data: { topicExpansion: { ...state.topicExpansion, [entry.path]: next } },
+      data: {
+        topicExpansion: nextExpansion,
+        selectedTopicIndex: leafIndex >= 0 ? leafIndex : state.selectedTopicIndex,
+      },
     });
   };
 

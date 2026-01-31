@@ -50,6 +50,29 @@ const buildTopicTree = (topics: string[]) => {
   return root;
 };
 
+const findTopicNode = (root: TopicNode, path: string) => {
+  if (!path) return root;
+  const parts = path.split("/").filter((part) => part.length > 0);
+  let node = root;
+  for (const part of parts) {
+    const next = node.children.get(part);
+    if (!next) return null;
+    node = next;
+  }
+  return node;
+};
+
+const getFirstLeafPath = (node: TopicNode) => {
+  let current = node;
+  while (current.children.size > 0) {
+    const children = Array.from(current.children.values()).sort((a, b) => a.name.localeCompare(b.name));
+    const next = children[0];
+    if (!next) break;
+    current = next;
+  }
+  return current.path;
+};
+
 export type TopicEntry = {
   path: string;
   label: string;
@@ -81,6 +104,14 @@ export const getTopicTreeEntries = (
 
   walk(tree, 0);
   return { entries, topicPaths };
+};
+
+export const getFirstLeafTopicPath = (state: AppState, parentPath: string) => {
+  const filtered = getFilteredTopics(state.topics, state.excludeFilters, state.searchQuery);
+  const tree = buildTopicTree(filtered);
+  const node = findTopicNode(tree, parentPath);
+  if (!node) return null;
+  return getFirstLeafPath(node);
 };
 
 export const getPayloadEntries = (message?: TopicMessage) => {
