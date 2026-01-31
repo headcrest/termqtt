@@ -319,6 +319,16 @@ export const MessageDialog = ({
         setFocus("topic");
         return true;
       }
+      if (key.ctrl && key.name === "r" && focus === "topic") {
+        const parts = topic.split("/");
+        const toggled = parts.map((part) => {
+          if (part === "read") return "write";
+          if (part === "write") return "read";
+          return part;
+        });
+        setTopic(toggled.join("/"));
+        return true;
+      }
       if (key.ctrl && key.name === "s") {
         setSaveName("");
         setShowSavePrompt(true);
@@ -561,8 +571,8 @@ export const MessageDialog = ({
       <text
         content={
           status
-            ? `Status: ${status} | Tab/Shift+Tab fields | Ctrl+k clear field | Ctrl+n add row | Ctrl+d delete row | Ctrl+s save | Ctrl+l saved list | Esc close`
-            : "Tab/Shift+Tab fields | Ctrl+k clear field | Ctrl+n add row | Ctrl+d delete row | Ctrl+s save | Ctrl+l saved list | Esc close"
+            ? `Status: ${status} | Tab/Shift+Tab fields | Ctrl+k clear field | Ctrl+r toggle read/write | Ctrl+n add row | Ctrl+d delete row | Ctrl+s save | Ctrl+l saved list | Esc close`
+            : "Tab/Shift+Tab fields | Ctrl+k clear field | Ctrl+r toggle read/write | Ctrl+n add row | Ctrl+d delete row | Ctrl+s save | Ctrl+l saved list | Esc close"
         }
         fg="#94a3b8"
       />
