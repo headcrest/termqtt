@@ -204,6 +204,39 @@ export const useKeyboardShortcuts = ({
       return;
     }
     if (key.name === "4") {
+      const fav = state.favourites[state.selectedFavouriteIndex];
+      if (fav) {
+        const topicIndex = topicPaths.indexOf(fav.topic);
+        if (topicIndex >= 0) {
+          dispatch({
+            type: "set",
+            data: { activePane: "favourites", selectedTopicIndex: topicIndex, selectedPayloadIndex: 0 },
+          });
+          return;
+        }
+        const parts = fav.topic.split("/").filter((part) => part.length > 0);
+        const nextExpansion = { ...state.topicExpansion };
+        let currentPath = "";
+        for (const part of parts.slice(0, -1)) {
+          currentPath = currentPath ? `${currentPath}/${part}` : part;
+          nextExpansion[currentPath] = true;
+        }
+        const nextTree = getTopicTreeEntries({
+          ...state,
+          topicExpansion: nextExpansion,
+        });
+        const nextIndex = nextTree.topicPaths.indexOf(fav.topic);
+        dispatch({
+          type: "set",
+          data: {
+            activePane: "favourites",
+            topicExpansion: nextExpansion,
+            selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
+            selectedPayloadIndex: nextIndex >= 0 ? 0 : state.selectedPayloadIndex,
+          },
+        });
+        return;
+      }
       dispatch({ type: "set", data: { activePane: "favourites" } });
       return;
     }

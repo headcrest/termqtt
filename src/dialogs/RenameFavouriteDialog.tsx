@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { KeyEvent } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import { useDialog } from "./DialogContext";
 
 type RenameFavouriteDialogProps = {
@@ -8,11 +9,12 @@ type RenameFavouriteDialogProps = {
 };
 
 export const RenameFavouriteDialog = ({ initialValue, onSave }: RenameFavouriteDialogProps) => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
   const [value, setValue] = useState(initialValue);
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       if (key.name === "escape") {
         closeDialog();
         return true;
@@ -27,10 +29,9 @@ export const RenameFavouriteDialog = ({ initialValue, onSave }: RenameFavouriteD
     [closeDialog, onSave, value],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box
@@ -38,10 +39,10 @@ export const RenameFavouriteDialog = ({ initialValue, onSave }: RenameFavouriteD
       border
       style={{
         position: "absolute",
-        width: 50,
+        width: "60%",
         height: 5,
         left: "20%",
-        top: "15%",
+        top: "45%",
         borderStyle: "double",
         borderColor: "#3b82f6",
         backgroundColor: "#0c1019",

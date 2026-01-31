@@ -118,9 +118,69 @@ const AppContent = () => {
     const topicIndex = topicTree.topicPaths.indexOf(fav.topic);
     if (topicIndex >= 0) {
       dispatch({ type: "set", data: { selectedTopicIndex: topicIndex, activePane: "topics" } });
-    } else {
-      dispatch({ type: "set", data: { searchQuery: "", activePane: "topics" } });
+      return;
     }
+    const parts = fav.topic.split("/").filter((part) => part.length > 0);
+    const nextExpansion = { ...state.topicExpansion };
+    let currentPath = "";
+    for (const part of parts.slice(0, -1)) {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      nextExpansion[currentPath] = true;
+    }
+    const nextTree = getTopicTreeEntries({
+      ...state,
+      topicExpansion: nextExpansion,
+    });
+    const nextIndex = nextTree.topicPaths.indexOf(fav.topic);
+    dispatch({
+      type: "set",
+      data: {
+        topicExpansion: nextExpansion,
+        selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
+        activePane: "topics",
+      },
+    });
+  };
+
+  const handleFavouriteChange = (index: number) => {
+    const fav = state.favourites[index];
+    if (!fav) {
+      dispatch({ type: "set", data: { selectedFavouriteIndex: index } });
+      return;
+    }
+    const topicIndex = topicTree.topicPaths.indexOf(fav.topic);
+    if (topicIndex >= 0) {
+      dispatch({
+        type: "set",
+        data: {
+          selectedFavouriteIndex: index,
+          selectedTopicIndex: topicIndex,
+          selectedPayloadIndex: 0,
+        },
+      });
+      return;
+    }
+    const parts = fav.topic.split("/").filter((part) => part.length > 0);
+    const nextExpansion = { ...state.topicExpansion };
+    let currentPath = "";
+    for (const part of parts.slice(0, -1)) {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      nextExpansion[currentPath] = true;
+    }
+    const nextTree = getTopicTreeEntries({
+      ...state,
+      topicExpansion: nextExpansion,
+    });
+    const nextIndex = nextTree.topicPaths.indexOf(fav.topic);
+    dispatch({
+      type: "set",
+      data: {
+        selectedFavouriteIndex: index,
+        selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
+        selectedPayloadIndex: nextIndex >= 0 ? 0 : state.selectedPayloadIndex,
+        topicExpansion: nextExpansion,
+      },
+    });
   };
 
   const handleTopicSelect = (index: number) => {
@@ -216,7 +276,7 @@ const AppContent = () => {
           dispatch({ type: "set", data: { selectedTopicIndex: index, selectedPayloadIndex: 0 } })
         }
         onTopicSelect={handleTopicSelect}
-        onFavouriteChange={(index) => dispatch({ type: "set", data: { selectedFavouriteIndex: index } })}
+        onFavouriteChange={handleFavouriteChange}
         onFavouriteSelect={handleFavouriteSelect}
         onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index } })}
         onWatchChange={(index) => dispatch({ type: "set", data: { selectedWatchIndex: index } })}
