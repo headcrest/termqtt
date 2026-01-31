@@ -1,4 +1,5 @@
 import mqtt, { type IClientOptions, type MqttClient } from "mqtt";
+import os from "node:os";
 import type { BrokerConfig } from "./state";
 
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
@@ -14,8 +15,15 @@ const buildUrl = (config: BrokerConfig) => {
   return `${protocol}://${config.host}:${config.port}`;
 };
 
+const buildClientId = (config: BrokerConfig) => {
+  const base = config.clientId?.trim() || "termqtt2";
+  const host = os.hostname();
+  const pid = process.pid;
+  return `${base}-${host}-${pid}`;
+};
+
 const buildOptions = (config: BrokerConfig): IClientOptions => ({
-  clientId: config.clientId || `termqtt2-${Math.random().toString(16).slice(2)}`,
+  clientId: buildClientId(config),
   username: config.username || undefined,
   password: config.password || undefined,
   reconnectPeriod: 1000,
