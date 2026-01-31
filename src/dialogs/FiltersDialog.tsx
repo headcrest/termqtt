@@ -125,7 +125,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
         selectedIndex={selectedIndex}
         onChange={(index) => setSelectedIndex(index)}
         showDescription={false}
-        selectedBackgroundColor="#38bdf8"
+        selectedBackgroundColor="#2d8cff"
         selectedTextColor="#0b1220"
         style={{ width: "100%", height: "100%" }}
       />

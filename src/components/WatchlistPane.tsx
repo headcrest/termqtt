@@ -1,5 +1,5 @@
 import type { SelectOption } from "@opentui/core";
-import { paneActiveBackground } from "../ui/paneTheme";
+import { paneActiveBackground, paneInactiveBackground } from "../ui/paneTheme";
 
 type WatchlistPaneProps = {
   options: SelectOption[];
@@ -25,9 +25,9 @@ export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange
         focused={focused}
         selectedIndex={selectedIndex}
         onChange={(index) => onChange(index)}
-        backgroundColor={focused ? paneActiveBackground : undefined}
+        backgroundColor={focused ? paneActiveBackground : paneInactiveBackground}
         focusedBackgroundColor={paneActiveBackground}
-        selectedBackgroundColor={focused ? "#d97706" : undefined}
+        selectedBackgroundColor={focused ? "#2d8cff" : paneInactiveBackground}
         selectedTextColor={focused ? "#0b1220" : "#ffffff"}
         textColor={focused ? "#e2e8f0" : "#ffffff"}
         descriptionColor={focused ? "#9ca3af" : "#ffffff"}
