@@ -1,12 +1,14 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import type { KeyEvent } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import { useDialog } from "./DialogContext";
 
 export const HelpDialog = () => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       if (key.name === "escape" || key.name === "return") {
         closeDialog();
         return true;
@@ -16,10 +18,9 @@ export const HelpDialog = () => {
     [closeDialog],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box
@@ -27,9 +28,9 @@ export const HelpDialog = () => {
       border
       style={{
         position: "absolute",
-        width: "80%",
-        height: "70%",
-        left: "10%",
+        width: "70%",
+        height: "80%",
+        left: "15%",
         top: "10%",
         borderStyle: "double",
         borderColor: "#3b82f6",

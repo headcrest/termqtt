@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { KeyEvent } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import { useDialog } from "./DialogContext";
 
 type SearchDialogProps = {
@@ -8,11 +9,12 @@ type SearchDialogProps = {
 };
 
 export const SearchDialog = ({ initialQuery, onSubmit }: SearchDialogProps) => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
   const [value, setValue] = useState(initialQuery);
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       if (key.name === "escape") {
         closeDialog();
         return true;
@@ -27,10 +29,9 @@ export const SearchDialog = ({ initialQuery, onSubmit }: SearchDialogProps) => {
     [closeDialog, onSubmit, value],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box
@@ -38,10 +39,10 @@ export const SearchDialog = ({ initialQuery, onSubmit }: SearchDialogProps) => {
       border
       style={{
         position: "absolute",
-        width: 50,
+        width: "60%",
         height: 5,
-        left: "15%",
-        top: "10%",
+        left: "20%",
+        top: "45%",
         borderStyle: "double",
         borderColor: "#3b82f6",
         backgroundColor: "#0c1019",
@@ -52,7 +53,10 @@ export const SearchDialog = ({ initialQuery, onSubmit }: SearchDialogProps) => {
     >
       <input
         value={value}
-        onInput={setValue}
+        onInput={(nextValue) => {
+          setValue(nextValue);
+          onSubmit(nextValue);
+        }}
         placeholder="Type to filter topics..."
         focused
         style={{ focusedBackgroundColor: "#111827" }}

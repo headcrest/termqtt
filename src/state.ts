@@ -92,7 +92,11 @@ export const createInitialState = (): AppState => ({
   favourites: [],
   watchlist: [],
   savedMessages: [],
-  excludeFilters: [{ pattern: "read", enabled: true }],
+  excludeFilters: [
+    { pattern: "read", enabled: true },
+    { pattern: "data", enabled: true },
+    { pattern: "config", enabled: true },
+  ],
   searchQuery: "",
   selectedTopicIndex: 0,
   selectedPayloadIndex: 0,

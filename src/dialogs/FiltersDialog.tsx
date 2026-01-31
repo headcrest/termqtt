@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { KeyEvent, SelectOption } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import type { ExcludeFilter } from "../state";
 import { useDialog } from "./DialogContext";
 
@@ -9,7 +10,7 @@ type FiltersDialogProps = {
 };
 
 export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
   const [filters, setFilters] = useState<ExcludeFilter[]>(initialFilters.map((f) => ({ ...f })));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [promptMode, setPromptMode] = useState<null | "add" | "edit">(null);
@@ -18,8 +19,8 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
   const options: SelectOption[] = useMemo(
     () =>
       filters.map((filter) => ({
-        name: filter.pattern,
-        description: filter.enabled ? "enabled" : "disabled",
+        name: `${filter.enabled ? "[x]" : "[ ]"} ${filter.pattern || "(empty)"}`,
+        description: "",
       })),
     [filters],
   );
@@ -35,6 +36,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       if (key.name === "escape") {
         if (promptMode) {
           setPromptMode(null);
@@ -94,10 +96,9 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
     [closeDialog, filters, onSave, promptMode, promptValue, selectedIndex],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box
@@ -105,10 +106,10 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
       border
       style={{
         position: "absolute",
-        width: 60,
-        height: "60%",
-        left: "15%",
-        top: "10%",
+        width: "60%",
+        height: "50%",
+        left: "20%",
+        top: "25%",
         borderStyle: "double",
         borderColor: "#3b82f6",
         backgroundColor: "#0c1019",
@@ -123,21 +124,30 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
         focused={promptMode === null}
         selectedIndex={selectedIndex}
         onChange={(index) => setSelectedIndex(index)}
+        showDescription={false}
         selectedBackgroundColor="#38bdf8"
         selectedTextColor="#0b1220"
         style={{ width: "100%", height: "100%" }}
       />
-      {promptMode ? (
-        <box style={{ flexDirection: "column", gap: 0 }}>
-          <text content={promptMode === "add" ? "New Filter" : "Edit Filter"} fg="#94a3b8" />
-          <input
-            value={promptValue}
-            onInput={setPromptValue}
-            focused
-            style={{ focusedBackgroundColor: "#111827" }}
-          />
-        </box>
-      ) : null}
+      <box style={{ flexDirection: "column", gap: 0 }}>
+        <text
+          content={
+            promptMode === "edit"
+              ? "Edit Filter"
+              : promptMode === "add"
+                ? "New Filter"
+                : "Custom Filter (press a to add)"
+          }
+          fg={promptMode ? "#93c5fd" : "#94a3b8"}
+        />
+        <input
+          value={promptValue}
+          onInput={setPromptValue}
+          placeholder={promptMode ? "" : "Type pattern and press Enter"}
+          focused={promptMode !== null}
+          style={{ focusedBackgroundColor: "#111827" }}
+        />
+      </box>
     </box>
   );
 };

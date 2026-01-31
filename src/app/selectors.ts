@@ -2,7 +2,12 @@ import { flattenJson, formatValue, prettyJson } from "../json";
 import type { AppState, ExcludeFilter, TopicMessage } from "../state";
 
 const matchTopicFilter = (topic: string, filter: string): boolean => {
+  if (!filter) return false;
   if (filter === "#") return true;
+  const hasWildcard = filter.includes("#") || filter.includes("+");
+  if (!hasWildcard) {
+    return topic.toLowerCase().includes(filter.toLowerCase());
+  }
   const filterLevels = filter.split("/");
   const topicLevels = topic.split("/");
   for (let i = 0; i < filterLevels.length; i += 1) {

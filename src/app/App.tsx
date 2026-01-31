@@ -2,6 +2,7 @@ import { useEffect, useMemo, useReducer, useRef } from "react";
 import type { SelectOption } from "@opentui/core";
 import { DialogProvider } from "../dialogs/DialogContext";
 import { DialogHost } from "../dialogs/DialogHost";
+import { FooterBar } from "../components/FooterBar";
 import { PaneLayout } from "../components/PaneLayout";
 import { StatusBar } from "../components/StatusBar";
 import { useMqtt } from "../hooks/useMqtt";
@@ -42,6 +43,17 @@ const AppContent = () => {
   const watchOptions = useMemo(() => getWatchOptions(state), [state]);
   const detailsContent = useMemo(() => getDetailsContent(selectedMessage), [selectedMessage]);
   const statusLines = useMemo(() => getStatusLines(state), [state]);
+  const shortcutLine = useMemo(() => {
+    const global = "tab/shift+tab cycle | 1-5 focus | b broker | / search | ? help | q quit";
+    const perPane: Record<AppState["activePane"], string> = {
+      topics: "j/k move | h/l collapse/expand | space favourite",
+      favourites: "j/k move | space remove | r rename | enter select",
+      payload: "j/k move | space watch",
+      watchlist: "j/k move | space remove",
+      details: "e edit | n new",
+    };
+    return `Shortcuts: ${perPane[state.activePane]} | ${global}`;
+  }, [state.activePane]);
 
   useKeyboardShortcuts({
     state,
@@ -284,6 +296,7 @@ const AppContent = () => {
         detailsContent={detailsContent.content}
         detailsIsJson={detailsContent.isJson}
       />
+      <FooterBar content={shortcutLine} />
       <DialogHost
         state={state}
         topicPaths={topicTree.topicPaths}

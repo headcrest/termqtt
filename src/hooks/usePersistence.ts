@@ -11,6 +11,17 @@ type Persisted = {
   excludeFilters: ExcludeFilter[];
 };
 
+const ensureDefaultFilters = (filters: ExcludeFilter[]) => {
+  const defaults = ["read", "data", "config"];
+  const existing = new Map(filters.map((filter) => [filter.pattern, filter]));
+  for (const pattern of defaults) {
+    if (!existing.has(pattern)) {
+      existing.set(pattern, { pattern, enabled: true });
+    }
+  }
+  return Array.from(existing.values());
+};
+
 const normalizeBrokerConfig = (value: unknown, fallback: BrokerConfig): BrokerConfig => {
   if (!value || typeof value !== "object") return fallback;
   const partial = value as Partial<BrokerConfig>;
@@ -51,7 +62,7 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
           favourites: loaded.favourites,
           watchlist: loaded.watchlist,
           savedMessages: loaded.savedMessages,
-          excludeFilters: loaded.excludeFilters,
+          excludeFilters: ensureDefaultFilters(loaded.excludeFilters),
         },
       });
     };

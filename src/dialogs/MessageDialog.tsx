@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyEvent, SelectOption, TextareaRenderable } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import { parseJson } from "../json";
 import type { SavedMessage } from "../state";
 import { useDialog } from "./DialogContext";
@@ -25,7 +26,7 @@ export const MessageDialog = ({
   onDeleteSaved,
   onLoadSaved,
 }: MessageDialogProps) => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
   const [topic, setTopic] = useState(initialTopic);
   const [focus, setFocus] = useState<"topic" | "payload" | "saved">("payload");
   const [status, setStatus] = useState("");
@@ -45,6 +46,7 @@ export const MessageDialog = ({
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       if (showSavePrompt) {
         if (key.name === "escape") {
           setShowSavePrompt(false);
@@ -145,10 +147,9 @@ export const MessageDialog = ({
     ],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box
