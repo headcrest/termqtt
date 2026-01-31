@@ -148,18 +148,25 @@ export const getWatchOptions = (state: AppState) => {
   });
 };
 
-export const getStatusLines = (state: AppState) => {
+export const getStatusLine = (state: AppState) => {
   const status = state.connectionStatus.toUpperCase();
   const host = `${state.broker.host}:${state.broker.port}`;
-  const filter = state.broker.topicFilter || "#";
-  const search = state.searchQuery ? `search:${state.searchQuery}` : "search:off";
-  const excludes = state.excludeFilters.filter((f) => f.enabled).length;
+  const searchActive = state.searchQuery.trim().length > 0;
+  const search = searchActive ? `search:${state.searchQuery}` : "search:off";
+  const excludesCount = state.excludeFilters.filter((f) => f.enabled).length;
+  const excludes = `excludes:${excludesCount}`;
   const error = state.connectionError ? `error:${state.connectionError}` : "";
-  const total = `messages:${state.messageCount}`;
-  const line1 = `${status}  broker:${host}  filter:${filter}  ${search}`.trim();
   const debug = state.debugKeys && state.lastKeyDebug ? `key:${state.lastKeyDebug}` : "";
-  const line2 = `${total}  excludes:${excludes} ${error} ${debug}`.trim();
-  return { line1, line2 };
+  return {
+    status,
+    host,
+    search,
+    searchActive,
+    excludes,
+    excludesActive: excludesCount > 0,
+    error,
+    debug,
+  };
 };
 
 export const getDetailsContent = (message?: TopicMessage) => {

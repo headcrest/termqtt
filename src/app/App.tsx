@@ -13,7 +13,7 @@ import { reducer } from "./reducer";
 import {
   getDetailsContent,
   getPayloadEntries,
-  getStatusLines,
+  getStatusLine,
   getFirstLeafTopicPath,
   getTopicTreeEntries,
   getWatchOptions,
@@ -42,9 +42,9 @@ const AppContent = () => {
   const payloadEntries = useMemo(() => getPayloadEntries(selectedMessage), [selectedMessage]);
   const watchOptions = useMemo(() => getWatchOptions(state), [state]);
   const detailsContent = useMemo(() => getDetailsContent(selectedMessage), [selectedMessage]);
-  const statusLines = useMemo(() => getStatusLines(state), [state]);
+  const statusLine = useMemo(() => getStatusLine(state), [state]);
   const shortcutLine = useMemo(() => {
-    const global = "tab/shift+tab cycle | 1-5 focus | b broker | / search | ? help | q quit";
+    const global = "tab/shift+tab cycle | 1-5 focus | b broker | / search | f filters | ? help | q quit";
     const perPane: Record<AppState["activePane"], string> = {
       topics: "j/k move | h/l collapse/expand | space favourite",
       favourites: "j/k move | space remove | r rename | enter select",
@@ -83,7 +83,13 @@ const AppContent = () => {
   }, [state.selectedTopicIndex, topicTree.entries.length]);
 
   useEffect(() => {
-    if (state.selectedFavouriteIndex >= state.favourites.length) {
+    if (state.favourites.length === 0) {
+      if (state.selectedFavouriteIndex !== -1) {
+        dispatch({ type: "set", data: { selectedFavouriteIndex: -1 } });
+      }
+      return;
+    }
+    if (state.selectedFavouriteIndex >= state.favourites.length || state.selectedFavouriteIndex < 0) {
       dispatch({
         type: "set",
         data: { selectedFavouriteIndex: Math.max(0, state.favourites.length - 1) },
@@ -101,7 +107,13 @@ const AppContent = () => {
   }, [state.selectedPayloadIndex, payloadEntries.length]);
 
   useEffect(() => {
-    if (state.selectedWatchIndex >= watchOptions.length) {
+    if (watchOptions.length === 0) {
+      if (state.selectedWatchIndex !== -1) {
+        dispatch({ type: "set", data: { selectedWatchIndex: -1 } });
+      }
+      return;
+    }
+    if (state.selectedWatchIndex >= watchOptions.length || state.selectedWatchIndex < 0) {
       dispatch({
         type: "set",
         data: { selectedWatchIndex: Math.max(0, watchOptions.length - 1) },
@@ -269,7 +281,16 @@ const AppContent = () => {
 
   return (
     <box style={{ width: "100%", height: "100%", flexDirection: "column", backgroundColor: "#0f1117" }}>
-      <StatusBar line1={statusLines.line1} line2={statusLines.line2} />
+      <StatusBar
+        status={statusLine.status}
+        host={statusLine.host}
+        search={statusLine.search}
+        searchActive={statusLine.searchActive}
+        excludes={statusLine.excludes}
+        excludesActive={statusLine.excludesActive}
+        error={statusLine.error}
+        debug={statusLine.debug}
+      />
       <PaneLayout
         activePane={state.activePane}
         topicsOptions={topicsOptions}

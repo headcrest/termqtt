@@ -154,7 +154,7 @@ export const useKeyboardShortcuts = ({
       return;
     }
 
-    if (key.ctrl && key.name === "f") {
+    if (key.name === "f") {
       openDialog({ type: "filters" });
       return;
     }
@@ -284,8 +284,16 @@ export const useKeyboardShortcuts = ({
         dispatch({ type: "set", data: { favourites } });
       }
       if (state.activePane === "favourites") {
-        const favourites = state.favourites.filter((_, idx) => idx !== state.selectedFavouriteIndex);
-        dispatch({ type: "set", data: { favourites } });
+        if (state.favourites.length === 0) return;
+        const index = Math.min(state.selectedFavouriteIndex, state.favourites.length - 1);
+        const favourites = state.favourites.filter((_, idx) => idx !== index);
+        dispatch({
+          type: "set",
+          data: {
+            favourites,
+            selectedFavouriteIndex: favourites.length === 0 ? -1 : Math.max(0, index - 1),
+          },
+        });
       }
       if (state.activePane === "payload") {
         const topic = topicPaths[state.selectedTopicIndex];
@@ -298,8 +306,16 @@ export const useKeyboardShortcuts = ({
         dispatch({ type: "set", data: { watchlist } });
       }
       if (state.activePane === "watchlist") {
-        const watchlist = state.watchlist.filter((_, idx) => idx !== state.selectedWatchIndex);
-        dispatch({ type: "set", data: { watchlist } });
+        if (state.watchlist.length === 0) return;
+        const index = Math.min(state.selectedWatchIndex, state.watchlist.length - 1);
+        const watchlist = state.watchlist.filter((_, idx) => idx !== index);
+        dispatch({
+          type: "set",
+          data: {
+            watchlist,
+            selectedWatchIndex: watchlist.length === 0 ? -1 : Math.max(0, index - 1),
+          },
+        });
       }
       return;
     }

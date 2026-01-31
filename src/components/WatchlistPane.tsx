@@ -20,19 +20,23 @@ export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange
         backgroundColor: focused ? paneActiveBackground : undefined,
       }}
     >
-      <select
-        options={options}
-        focused={focused}
-        selectedIndex={selectedIndex}
-        onChange={(index) => onChange(index)}
-        backgroundColor={focused ? paneActiveBackground : paneInactiveBackground}
-        focusedBackgroundColor={paneActiveBackground}
-        selectedBackgroundColor={focused ? "#2d8cff" : paneInactiveBackground}
-        selectedTextColor={focused ? "#0b1220" : "#ffffff"}
-        textColor={focused ? "#e2e8f0" : "#ffffff"}
-        descriptionColor={focused ? "#9ca3af" : "#ffffff"}
-        style={{ height: "100%", width: "100%" }}
-      />
+      {options.length === 0 ? (
+        <text content="(no watchlist)" fg={focused ? "#9ca3af" : "#ffffff"} />
+      ) : (
+        <select
+          options={options}
+          focused={focused}
+          selectedIndex={Math.max(0, selectedIndex)}
+          onChange={(index) => onChange(index)}
+          backgroundColor={focused ? paneActiveBackground : paneInactiveBackground}
+          focusedBackgroundColor={paneActiveBackground}
+          selectedBackgroundColor={focused ? "#2d8cff" : paneInactiveBackground}
+          selectedTextColor={focused ? "#0b1220" : "#ffffff"}
+          textColor={focused ? "#e2e8f0" : "#ffffff"}
+          descriptionColor={focused ? "#9ca3af" : "#ffffff"}
+          style={{ height: "100%", width: "100%" }}
+        />
+      )}
     </box>
   );
 };

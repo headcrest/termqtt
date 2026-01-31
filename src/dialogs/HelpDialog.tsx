@@ -41,7 +41,7 @@ export const HelpDialog = () => {
       }}
     >
       <text
-        content={`Global\n\n- Tab / Shift+Tab cycle sections (1→2→3→4→5)\n- 1 Topics, 2 Payload, 3 Details, 4 Favourites, 5 Watchlist\n- j/k or ↓/↑ move selection\n- h/l or ←/→ collapse/expand tree\n- b broker config\n- / search topics\n- Ctrl+f exclude filters\n- ? help\n- q quit\n\nTopics\n- space toggle favourite (leaf topics)\n\nFavourites\n- space remove favourite\n- r rename favourite\n\nPayload\n- space toggle watchlist\n\nWatchlist\n- space remove watch entry\n\nDetails\n- e edit and publish\n- n new message\n\nDialogs\n- Tab/Shift+Tab change field\n- Ctrl+k clear payload\n- Ctrl+x clear all fields\n- Ctrl+t focus topic\n- Ctrl+s save message\n- Ctrl+l focus saved list\n- Enter confirm\n- Esc cancel`}
+        content={`Global\n\n- Tab / Shift+Tab cycle sections (1→2→3→4→5)\n- 1 Topics, 2 Payload, 3 Details, 4 Favourites, 5 Watchlist\n- j/k or ↓/↑ move selection\n- h/l or ←/→ collapse/expand tree\n- b broker config\n- / search topics\n- f exclude filters\n- ? help\n- q quit\n\nTopics\n- space toggle favourite (leaf topics)\n\nFavourites\n- space remove favourite\n- r rename favourite\n\nPayload\n- space toggle watchlist\n\nWatchlist\n- space remove watch entry\n\nDetails\n- e edit and publish\n- n new message\n\nDialogs\n- Tab/Shift+Tab change field\n- Ctrl+k clear payload\n- Ctrl+x clear all fields\n- Ctrl+t focus topic\n- Ctrl+s save message\n- Ctrl+l focus saved list\n- Enter confirm\n- Esc cancel`}
         fg="#cbd5f5"
       />
     </box>

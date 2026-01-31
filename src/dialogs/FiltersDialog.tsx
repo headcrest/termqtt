@@ -60,6 +60,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
               );
             }
           }
+          setPromptValue("");
           setPromptMode(null);
           return true;
         }
@@ -127,9 +128,9 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
         showDescription={false}
         selectedBackgroundColor="#2d8cff"
         selectedTextColor="#0b1220"
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", flexGrow: 1 }}
       />
-      <box style={{ flexDirection: "column", gap: 0 }}>
+      <box style={{ flexDirection: "column", gap: 0, height: 4 }}>
         <text
           content={
             promptMode === "edit"
@@ -147,6 +148,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
           focused={promptMode !== null}
           style={{ focusedBackgroundColor: "#111827" }}
         />
+        <text content="Shortcuts: space toggle • a add • e edit • d delete • enter apply • esc close" fg="#64748b" />
       </box>
     </box>
   );

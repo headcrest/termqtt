@@ -1,8 +1,32 @@
-export const StatusBar = ({ line1, line2 }: { line1: string; line2: string }) => {
+type StatusBarProps = {
+  status: string;
+  host: string;
+  search: string;
+  searchActive: boolean;
+  excludes: string;
+  excludesActive: boolean;
+  error: string;
+  debug: string;
+};
+
+export const StatusBar = ({
+  status,
+  host,
+  search,
+  searchActive,
+  excludes,
+  excludesActive,
+  error,
+  debug,
+}: StatusBarProps) => {
   return (
-    <box style={{ height: 2, paddingLeft: 1, paddingRight: 1, backgroundColor: "#141824", flexDirection: "column" }}>
-      <text content={line1} fg="#9ca3af" />
-      <text content={line2} fg="#9ca3af" />
+    <box style={{ height: 1, paddingLeft: 1, paddingRight: 1, backgroundColor: "#141824", flexDirection: "row", gap: 2 }}>
+      <text content={status} fg="#9ca3af" />
+      <text content={`broker:${host}`} fg="#9ca3af" />
+      <text content={search} fg={searchActive ? "#f59e0b" : "#9ca3af"} />
+      <text content={excludes} fg={excludesActive ? "#ef4444" : "#9ca3af"} />
+      {error ? <text content={error} fg="#ef4444" /> : null}
+      {debug ? <text content={debug} fg="#93c5fd" /> : null}
     </box>
   );
 };
