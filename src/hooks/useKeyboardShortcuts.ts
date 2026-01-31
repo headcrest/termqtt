@@ -110,6 +110,7 @@ export const useKeyboardShortcuts = ({
     }
     if (key.name === "q") {
       renderer?.destroy();
+      process.exit(0);
       return;
     }
     if (key.name === "/") {
