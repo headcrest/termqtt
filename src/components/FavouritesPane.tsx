@@ -1,4 +1,5 @@
 import type { SelectOption } from "@opentui/core";
+import { paneActiveBackground } from "../ui/paneTheme";
 
 type FavouritesPaneProps = {
   options: SelectOption[];
@@ -21,7 +22,11 @@ export const FavouritesPane = ({
     <box
       title={`4 Favourites (${count})`}
       border
-      style={{ height: "30%", borderColor: focused ? "#3b82f6" : "#2a3344" }}
+      style={{
+        height: "30%",
+        borderColor: focused ? "#3b82f6" : "#ffffff",
+        backgroundColor: focused ? paneActiveBackground : undefined,
+      }}
     >
       <select
         options={options}
@@ -29,8 +34,12 @@ export const FavouritesPane = ({
         selectedIndex={selectedIndex}
         onChange={(index) => onChange(index)}
         onSelect={(index) => onSelect(index)}
+        backgroundColor={focused ? paneActiveBackground : undefined}
+        focusedBackgroundColor={paneActiveBackground}
         selectedBackgroundColor="#f59e0b"
-        selectedTextColor="#0b1220"
+        selectedTextColor={focused ? "#0b1220" : "#ffffff"}
+        textColor={focused ? "#e2e8f0" : "#ffffff"}
+        descriptionColor={focused ? "#9ca3af" : "#ffffff"}
         style={{ height: "100%", width: "100%" }}
       />
     </box>

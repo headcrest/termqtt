@@ -28,6 +28,7 @@ type PaneLayoutProps = {
   onWatchChange: (index: number) => void;
   detailsTitle: string;
   detailsContent: string;
+  detailsIsJson: boolean;
 };
 
 export const PaneLayout = ({
@@ -52,6 +53,7 @@ export const PaneLayout = ({
   onWatchChange,
   detailsTitle,
   detailsContent,
+  detailsIsJson,
 }: PaneLayoutProps) => {
   return (
     <box style={{ flexGrow: 1, flexDirection: "row", gap: 1, padding: 1 }}>
@@ -89,7 +91,12 @@ export const PaneLayout = ({
           onChange={onWatchChange}
         />
       </box>
-      <DetailsPane title={detailsTitle} content={detailsContent} focused={activePane === "details"} />
+      <DetailsPane
+        title={detailsTitle}
+        content={detailsContent}
+        isJson={detailsIsJson}
+        focused={activePane === "details"}
+      />
     </box>
   );
 };

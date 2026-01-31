@@ -126,8 +126,8 @@ export const getStatusLines = (state: AppState) => {
   return { line1, line2 };
 };
 
-export const getDetailsText = (message?: TopicMessage) => {
-  if (!message) return "No message selected";
-  if (message.json !== undefined) return prettyJson(message.json);
-  return message.payload;
+export const getDetailsContent = (message?: TopicMessage) => {
+  if (!message) return { content: "No message selected", isJson: false };
+  if (message.json !== undefined) return { content: prettyJson(message.json), isJson: true };
+  return { content: message.payload, isJson: false };
 };

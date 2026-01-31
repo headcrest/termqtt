@@ -10,7 +10,7 @@ import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useDialog } from "../dialogs/DialogContext";
 import { reducer } from "./reducer";
 import {
-  getDetailsText,
+  getDetailsContent,
   getPayloadEntries,
   getStatusLines,
   getTopicTreeEntries,
@@ -39,7 +39,7 @@ const AppContent = () => {
 
   const payloadEntries = useMemo(() => getPayloadEntries(selectedMessage), [selectedMessage]);
   const watchOptions = useMemo(() => getWatchOptions(state), [state]);
-  const detailsText = useMemo(() => getDetailsText(selectedMessage), [selectedMessage]);
+  const detailsContent = useMemo(() => getDetailsContent(selectedMessage), [selectedMessage]);
   const statusLines = useMemo(() => getStatusLines(state), [state]);
 
   useKeyboardShortcuts({
@@ -189,7 +189,8 @@ const AppContent = () => {
         onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index } })}
         onWatchChange={(index) => dispatch({ type: "set", data: { selectedWatchIndex: index } })}
         detailsTitle={selectedMessage ? `Details (${selectedMessage.topic})` : "Details"}
-        detailsContent={detailsText}
+        detailsContent={detailsContent.content}
+        detailsIsJson={detailsContent.isJson}
       />
       <DialogHost
         state={state}
