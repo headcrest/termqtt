@@ -37,6 +37,13 @@ export const loadJson = async <T>(fileName: string, fallback: T): Promise<T> => 
   }
 };
 
+export const hasBrokerConfig = async () => {
+  const dir = getConfigDir();
+  const path = join(dir, storageFiles.broker);
+  const file = Bun.file(path);
+  return file.exists();
+};
+
 export const saveJson = async (fileName: string, data: unknown) => {
   const dir = await ensureConfigDir();
   const path = join(dir, fileName);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 import type { SelectOption } from "@opentui/core";
 import { DialogProvider } from "../dialogs/DialogContext";
 import { DialogHost } from "../dialogs/DialogHost";
@@ -7,6 +7,7 @@ import { StatusBar } from "../components/StatusBar";
 import { useMqtt } from "../hooks/useMqtt";
 import { usePersistence } from "../hooks/usePersistence";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useDialog } from "../dialogs/DialogContext";
 import { reducer } from "./reducer";
 import {
   getDetailsText,
@@ -23,10 +24,13 @@ import {
   type SavedMessage,
 } from "../state";
 import { formatValue } from "../json";
+import { hasBrokerConfig } from "../storage";
 
 const AppContent = () => {
   const [state, dispatch] = useReducer(reducer, createInitialState());
   const { publish } = useMqtt(state.broker, dispatch);
+  const { openDialog, activeDialog } = useDialog();
+  const didPromptBroker = useRef(false);
 
   usePersistence(state, dispatch);
 
@@ -46,6 +50,16 @@ const AppContent = () => {
     topicPaths: topicTree.topicPaths,
     payloadEntries,
   });
+
+  useEffect(() => {
+    if (didPromptBroker.current || activeDialog) return;
+    const promptIfMissing = async () => {
+      if (await hasBrokerConfig()) return;
+      didPromptBroker.current = true;
+      openDialog({ type: "broker" });
+    };
+    void promptIfMissing();
+  }, [activeDialog, openDialog]);
 
   useEffect(() => {
     if (state.selectedTopicIndex >= topicTree.entries.length) {

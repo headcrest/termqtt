@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { KeyEvent } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import type { BrokerConfig } from "../state";
 import { useDialog } from "./DialogContext";
 
@@ -9,7 +10,7 @@ type BrokerDialogProps = {
 };
 
 export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
-  const { closeDialog, setDialogHandler } = useDialog();
+  const { closeDialog } = useDialog();
   const [broker, setBroker] = useState<BrokerConfig>(initialBroker);
   const [focusIndex, setFocusIndex] = useState(0);
 
@@ -69,8 +70,15 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
 
   const handleKey = useCallback(
     (key: KeyEvent) => {
+      if (!key) return false;
       const isShiftTab =
-        key.name === "backtab" || (key.name === "tab" && key.shift) || key.sequence === "\u001b[Z";
+        key.name === "backtab" ||
+        (key.name === "tab" && key.shift) ||
+        key.name === "teb" ||
+        key.sequence === "\u001b[Z" ||
+        key.sequence === "[Z" ||
+        (key.sequence ? key.sequence.endsWith("[Z") : false);
+      const isTab = key.name === "tab" || key.name === "teb" || key.sequence === "\t" || key.sequence === "\u0009";
       if (key.name === "escape") {
         closeDialog();
         return true;
@@ -79,7 +87,7 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         setFocusIndex((prev) => (prev - 1 + fields.length) % fields.length);
         return true;
       }
-      if (key.name === "tab") {
+      if (isTab) {
         setFocusIndex((prev) => (prev + 1) % fields.length);
         return true;
       }
@@ -93,10 +101,9 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
     [broker, closeDialog, fields.length, onSave],
   );
 
-  useEffect(() => {
-    setDialogHandler(handleKey);
-    return () => setDialogHandler(null);
-  }, [handleKey, setDialogHandler]);
+  useKeyboard((key) => {
+    handleKey(key);
+  });
 
   return (
     <box

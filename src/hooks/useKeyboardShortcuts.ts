@@ -80,6 +80,7 @@ export const useKeyboardShortcuts = ({
   };
 
   useKeyboard((key: KeyEvent) => {
+    if (!key) return;
     if (key.ctrl && key.name === "g") {
       dispatch({
         type: "set",

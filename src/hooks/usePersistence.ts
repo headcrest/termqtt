@@ -11,6 +11,27 @@ type Persisted = {
   excludeFilters: ExcludeFilter[];
 };
 
+const normalizeBrokerConfig = (value: unknown, fallback: BrokerConfig): BrokerConfig => {
+  if (!value || typeof value !== "object") return fallback;
+  const partial = value as Partial<BrokerConfig>;
+  const port = Number(partial.port ?? fallback.port);
+  const qosValue = Number(partial.qos ?? fallback.qos);
+  const qos = qosValue === 1 || qosValue === 2 ? (qosValue as 1 | 2) : 0;
+  return {
+    ...fallback,
+    ...partial,
+    host: typeof partial.host === "string" ? partial.host : fallback.host,
+    port: Number.isFinite(port) ? port : fallback.port,
+    clientId: typeof partial.clientId === "string" ? partial.clientId : fallback.clientId,
+    username: typeof partial.username === "string" ? partial.username : fallback.username,
+    password: typeof partial.password === "string" ? partial.password : fallback.password,
+    topicFilter: typeof partial.topicFilter === "string" ? partial.topicFilter : fallback.topicFilter,
+    defaultTopic: typeof partial.defaultTopic === "string" ? partial.defaultTopic : fallback.defaultTopic,
+    tls: typeof partial.tls === "boolean" ? partial.tls : fallback.tls,
+    qos,
+  };
+};
+
 export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -26,7 +47,7 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
       dispatch({
         type: "hydrate",
         data: {
-          broker: loaded.broker,
+          broker: normalizeBrokerConfig(loaded.broker, state.broker),
           favourites: loaded.favourites,
           watchlist: loaded.watchlist,
           savedMessages: loaded.savedMessages,
