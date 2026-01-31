@@ -55,7 +55,7 @@ export const PaneLayout = ({
 }: PaneLayoutProps) => {
   return (
     <box style={{ flexGrow: 1, flexDirection: "row", gap: 1, padding: 1 }}>
-      <box style={{ width: 30, flexDirection: "column", gap: 1 }}>
+      <box style={{ width: 30, flexDirection: "column", gap: 1, height: "100%" }}>
         <TopicsPane
           options={topicsOptions}
           selectedIndex={selectedTopicIndex}
@@ -73,7 +73,7 @@ export const PaneLayout = ({
           onSelect={onFavouriteSelect}
         />
       </box>
-      <box style={{ width: 50, flexDirection: "column", gap: 1 }}>
+      <box style={{ width: 50, flexDirection: "column", gap: 1, height: "100%" }}>
         <PayloadPane
           options={payloadOptions}
           selectedIndex={selectedPayloadIndex}

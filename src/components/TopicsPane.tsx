@@ -18,7 +18,11 @@ export const TopicsPane = ({
   onSelect,
 }: TopicsPaneProps) => {
   return (
-    <box title={`1 Topics (${count})`} border style={{ flexGrow: 1, borderColor: focused ? "#3b82f6" : "#2a3344" }}>
+    <box
+      title={`1 Topics (${count})`}
+      border
+      style={{ height: "70%", borderColor: focused ? "#3b82f6" : "#2a3344" }}
+    >
       <select
         options={options}
         focused={focused}

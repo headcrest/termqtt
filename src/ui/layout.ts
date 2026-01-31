@@ -68,6 +68,7 @@ export const createLayout = (renderer: CliRenderer): UiRefs => {
     id: "topics-box",
     width: 30,
     flexDirection: "column",
+    flexGrow: 7,
     border: true,
     borderStyle: "single",
     borderColor: "#2a3344",
@@ -76,7 +77,7 @@ export const createLayout = (renderer: CliRenderer): UiRefs => {
 
   const favouritesBox = new BoxRenderable(renderer, {
     id: "favourites-box",
-    flexGrow: 1,
+    flexGrow: 3,
     border: true,
     borderStyle: "single",
     borderColor: "#2a3344",
@@ -92,7 +93,7 @@ export const createLayout = (renderer: CliRenderer): UiRefs => {
 
   const payloadBox = new BoxRenderable(renderer, {
     id: "payload-box",
-    flexGrow: 2,
+    flexGrow: 7,
     border: true,
     borderStyle: "single",
     borderColor: "#2a3344",
@@ -101,7 +102,7 @@ export const createLayout = (renderer: CliRenderer): UiRefs => {
 
   const watchBox = new BoxRenderable(renderer, {
     id: "watch-box",
-    flexGrow: 1,
+    flexGrow: 3,
     border: true,
     borderStyle: "single",
     borderColor: "#2a3344",
