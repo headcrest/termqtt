@@ -27,7 +27,7 @@ export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange
         onChange={(index) => onChange(index)}
         backgroundColor={focused ? paneActiveBackground : undefined}
         focusedBackgroundColor={paneActiveBackground}
-        selectedBackgroundColor="#f472b6"
+        selectedBackgroundColor={focused ? "#d97706" : undefined}
         selectedTextColor={focused ? "#0b1220" : "#ffffff"}
         textColor={focused ? "#e2e8f0" : "#ffffff"}
         descriptionColor={focused ? "#9ca3af" : "#ffffff"}

@@ -36,7 +36,7 @@ export const FavouritesPane = ({
         onSelect={(index) => onSelect(index)}
         backgroundColor={focused ? paneActiveBackground : undefined}
         focusedBackgroundColor={paneActiveBackground}
-        selectedBackgroundColor="#f59e0b"
+        selectedBackgroundColor={focused ? "#d97706" : undefined}
         selectedTextColor={focused ? "#0b1220" : "#ffffff"}
         textColor={focused ? "#e2e8f0" : "#ffffff"}
         descriptionColor={focused ? "#9ca3af" : "#ffffff"}
