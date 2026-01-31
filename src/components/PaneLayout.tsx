@@ -56,47 +56,57 @@ export const PaneLayout = ({
   detailsIsJson,
 }: PaneLayoutProps) => {
   return (
-    <box style={{ flexGrow: 1, flexDirection: "row", gap: 1, padding: 1 }}>
-      <box style={{ width: 30, flexDirection: "column", gap: 1, height: "100%" }}>
-        <TopicsPane
-          options={topicsOptions}
-          selectedIndex={selectedTopicIndex}
-          focused={activePane === "topics"}
-          count={topicsCount}
-          onChange={onTopicChange}
-          onSelect={onTopicSelect}
-        />
-        <FavouritesPane
-          options={favouritesOptions}
-          selectedIndex={selectedFavouriteIndex}
-          focused={activePane === "favourites"}
-          count={favouritesCount}
-          onChange={onFavouriteChange}
-          onSelect={onFavouriteSelect}
-        />
+    <box style={{ flexGrow: 1, flexDirection: "column", gap: 1, padding: 1 }}>
+      <box style={{ height: "70%", flexDirection: "row", gap: 1 }}>
+        <box style={{ width: 36 }}>
+          <TopicsPane
+            options={topicsOptions}
+            selectedIndex={selectedTopicIndex}
+            focused={activePane === "topics"}
+            count={topicsCount}
+            onChange={onTopicChange}
+            onSelect={onTopicSelect}
+          />
+        </box>
+        <box style={{ width: 60 }}>
+          <PayloadPane
+            entries={payloadEntries}
+            selectedIndex={selectedPayloadIndex}
+            focused={activePane === "payload"}
+            count={payloadCount}
+            onChange={onPayloadChange}
+          />
+        </box>
+        <box style={{ flexGrow: 1 }}>
+          <DetailsPane
+            title={detailsTitle}
+            content={detailsContent}
+            isJson={detailsIsJson}
+            focused={activePane === "details"}
+          />
+        </box>
       </box>
-      <box style={{ width: 50, flexDirection: "column", gap: 1, height: "100%" }}>
-        <PayloadPane
-          entries={payloadEntries}
-          selectedIndex={selectedPayloadIndex}
-          focused={activePane === "payload"}
-          count={payloadCount}
-          onChange={onPayloadChange}
-        />
-        <WatchlistPane
-          options={watchOptions}
-          selectedIndex={selectedWatchIndex}
-          focused={activePane === "watchlist"}
-          count={watchCount}
-          onChange={onWatchChange}
-        />
+      <box style={{ height: "30%", flexDirection: "row", gap: 1 }}>
+        <box style={{ width: 36 }}>
+          <FavouritesPane
+            options={favouritesOptions}
+            selectedIndex={selectedFavouriteIndex}
+            focused={activePane === "favourites"}
+            count={favouritesCount}
+            onChange={onFavouriteChange}
+            onSelect={onFavouriteSelect}
+          />
+        </box>
+        <box style={{ flexGrow: 1 }}>
+          <WatchlistPane
+            options={watchOptions}
+            selectedIndex={selectedWatchIndex}
+            focused={activePane === "watchlist"}
+            count={watchCount}
+            onChange={onWatchChange}
+          />
+        </box>
       </box>
-      <DetailsPane
-        title={detailsTitle}
-        content={detailsContent}
-        isJson={detailsIsJson}
-        focused={activePane === "details"}
-      />
     </box>
   );
 };

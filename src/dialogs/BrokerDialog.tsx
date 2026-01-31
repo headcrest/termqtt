@@ -28,11 +28,6 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
           setBroker((prev) => ({ ...prev, port: Number(value) || 1883 })),
       },
       {
-        label: "Client ID",
-        value: broker.clientId,
-        set: (value: string) => setBroker((prev) => ({ ...prev, clientId: value })),
-      },
-      {
         label: "Username",
         value: broker.username,
         set: (value: string) => setBroker((prev) => ({ ...prev, username: value })),
@@ -43,14 +38,9 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         set: (value: string) => setBroker((prev) => ({ ...prev, password: value })),
       },
       {
-        label: "Subscribe Filter (topicFilter)",
+        label: "Root topic",
         value: broker.topicFilter,
         set: (value: string) => setBroker((prev) => ({ ...prev, topicFilter: value })),
-      },
-      {
-        label: "Publish Default Topic",
-        value: broker.defaultTopic,
-        set: (value: string) => setBroker((prev) => ({ ...prev, defaultTopic: value })),
       },
       {
         label: "TLS (true/false)",
@@ -92,7 +82,10 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         return true;
       }
       if (key.name === "return") {
-        onSave(broker);
+        onSave({
+          ...broker,
+          defaultTopic: broker.defaultTopic || broker.topicFilter,
+        });
         closeDialog();
         return true;
       }
@@ -112,7 +105,7 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
       style={{
         position: "absolute",
         width: "70%",
-        height: "60%",
+        height: "70%",
         left: "15%",
         top: "10%",
         borderStyle: "double",
@@ -124,17 +117,40 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         gap: 1,
       }}
     >
-      {fields.map((field, index) => (
-        <box key={field.label} style={{ flexDirection: "column" }}>
-          <text content={field.label} fg="#94a3b8" />
-          <input
-            value={field.value}
-            onInput={field.set}
-            focused={focusIndex === index}
-            style={{ focusedBackgroundColor: "#111827" }}
-          />
+      <scrollbox style={{ flexGrow: 1, width: "100%" }} scrollY>
+        <box style={{ flexDirection: "column", gap: 0 }}>
+          {fields.map((field, index) => (
+            <box
+              key={field.label}
+              border
+              style={{
+                height: 3,
+                borderColor: "#1f2937",
+                flexDirection: "row",
+                gap: 1,
+                paddingLeft: 1,
+                paddingRight: 1,
+              }}
+            >
+              <box style={{ width: "45%" }}>
+                <text content={field.label} fg="#94a3b8" />
+              </box>
+              <box style={{ flexGrow: 1 }}>
+                <input
+                  value={field.value}
+                  onInput={field.set}
+                  focused={focusIndex === index}
+                  style={{ focusedBackgroundColor: "#111827" }}
+                />
+              </box>
+            </box>
+          ))}
         </box>
-      ))}
+      </scrollbox>
+      <text
+        content="Tab/Shift+Tab fields • Enter save • Esc close"
+        fg="#94a3b8"
+      />
     </box>
   );
 };

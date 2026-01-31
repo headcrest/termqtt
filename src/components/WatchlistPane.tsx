@@ -15,7 +15,7 @@ export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange
       title={`5 Watchlist (${count})`}
       border
       style={{
-        height: "30%",
+        height: "100%",
         borderColor: focused ? "#3b82f6" : "#ffffff",
         backgroundColor: focused ? paneActiveBackground : undefined,
       }}

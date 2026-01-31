@@ -23,7 +23,7 @@ export const TopicsPane = ({
       title={`1 Topics (${count})`}
       border
       style={{
-        height: "70%",
+        height: "100%",
         borderColor: focused ? "#3b82f6" : "#ffffff",
         backgroundColor: focused ? paneActiveBackground : undefined,
       }}

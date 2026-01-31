@@ -57,7 +57,7 @@ export const PayloadPane = ({ entries, selectedIndex, focused, count, onChange }
       title={`2 Payload (${count})`}
       border
       style={{
-        height: "70%",
+        height: "100%",
         borderColor: focused ? "#3b82f6" : "#ffffff",
         backgroundColor: focused ? paneActiveBackground : undefined,
       }}

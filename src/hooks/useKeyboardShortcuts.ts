@@ -263,9 +263,7 @@ export const useKeyboardShortcuts = ({
     }
 
     if (key.name === "n") {
-      if (state.activePane === "details") {
-        openDialog({ type: "new" });
-      }
+      openDialog({ type: "new" });
       return;
     }
     if (key.name === "e" && state.activePane === "details") {
