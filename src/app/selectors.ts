@@ -84,11 +84,17 @@ export const getTopicTreeEntries = (
 };
 
 export const getPayloadEntries = (message?: TopicMessage) => {
-  if (!message) return [] as Array<{ path: string; value: unknown }>;
+  if (!message) return [] as Array<{ path: string; value: unknown; type: string }>;
   if (message.json !== undefined) {
-    return flattenJson(message.json).map((entry) => ({ path: entry.path, value: entry.value }));
+    return flattenJson(message.json).map((entry) => ({ path: entry.path, value: entry.value, type: entry.type }));
   }
-  return [{ path: "payload", value: message.payload }];
+  if (message.error) {
+    return [
+      { path: "error", value: `JSON parse error: ${message.error}`, type: "string" },
+      { path: "raw", value: message.payload, type: "string" },
+    ];
+  }
+  return [{ path: "raw", value: message.payload, type: "string" }];
 };
 
 export const getWatchOptions = (state: AppState) => {

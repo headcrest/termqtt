@@ -10,7 +10,7 @@ type UseKeyboardShortcutsProps = {
   dispatch: Dispatch<Action>;
   topicEntries: Array<{ path: string; depth: number; hasChildren: boolean }>;
   topicPaths: string[];
-  payloadEntries: Array<{ path: string; value: unknown }>;
+  payloadEntries: Array<{ path: string; value: unknown; type: string }>;
 };
 
 export const useKeyboardShortcuts = ({

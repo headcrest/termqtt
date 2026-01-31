@@ -5,8 +5,12 @@ export type FlattenedEntry = {
 };
 
 export const parseJson = (input: string): { ok: true; value: unknown } | { ok: false; error: string } => {
+  const cleaned = input.replace(/\0/g, "").trim();
+  if (!cleaned) {
+    return { ok: false, error: "Empty payload" };
+  }
   try {
-    return { ok: true, value: JSON.parse(input) };
+    return { ok: true, value: JSON.parse(cleaned) };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Invalid JSON" };
   }

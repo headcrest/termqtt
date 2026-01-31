@@ -10,7 +10,7 @@ type PaneLayoutProps = {
   activePane: Pane;
   topicsOptions: SelectOption[];
   favouritesOptions: SelectOption[];
-  payloadOptions: SelectOption[];
+  payloadEntries: Array<{ path: string; value: unknown; type: string }>;
   watchOptions: SelectOption[];
   topicsCount: number;
   favouritesCount: number;
@@ -34,7 +34,7 @@ export const PaneLayout = ({
   activePane,
   topicsOptions,
   favouritesOptions,
-  payloadOptions,
+  payloadEntries,
   watchOptions,
   topicsCount,
   favouritesCount,
@@ -75,7 +75,7 @@ export const PaneLayout = ({
       </box>
       <box style={{ width: 50, flexDirection: "column", gap: 1, height: "100%" }}>
         <PayloadPane
-          options={payloadOptions}
+          entries={payloadEntries}
           selectedIndex={selectedPayloadIndex}
           focused={activePane === "payload"}
           count={payloadCount}

@@ -23,7 +23,6 @@ import {
   type Favourite,
   type SavedMessage,
 } from "../state";
-import { formatValue } from "../json";
 import { hasBrokerConfig } from "../storage";
 
 const AppContent = () => {
@@ -111,10 +110,6 @@ const AppContent = () => {
     [state.favourites],
   );
 
-  const payloadOptions: SelectOption[] = useMemo(
-    () => payloadEntries.map((entry) => ({ name: entry.path, description: formatValue(entry.value) })),
-    [payloadEntries],
-  );
 
   const handleFavouriteSelect = (index: number) => {
     const fav = state.favourites[index];
@@ -175,7 +170,7 @@ const AppContent = () => {
         activePane={state.activePane}
         topicsOptions={topicsOptions}
         favouritesOptions={favouritesOptions}
-        payloadOptions={payloadOptions}
+        payloadEntries={payloadEntries}
         watchOptions={watchOptions}
         topicsCount={topicTree.entries.length}
         favouritesCount={state.favourites.length}
