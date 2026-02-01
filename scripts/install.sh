@@ -43,9 +43,19 @@ curl -fsSL "$URL" -o "$TMPDIR/$ASSET"
 mkdir -p "$PREFIX"
 unzip -oq "$TMPDIR/$ASSET" -d "$TMPDIR/unpacked"
 
-cp "$TMPDIR/unpacked/termqtt" "$PREFIX/termqtt"
+cp "$TMPDIR/unpacked/termqtt" "$PREFIX/termqtt-bin"
 cp "$TMPDIR/unpacked/parser.worker.js" "$PREFIX/parser.worker.js"
 cp "$TMPDIR/unpacked/tree-sitter.wasm" "$PREFIX/tree-sitter.wasm"
+chmod +x "$PREFIX/termqtt-bin"
+
+cat > "$PREFIX/termqtt" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+PREFIX_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$PREFIX_DIR"
+exec "$PREFIX_DIR/termqtt-bin" "$@"
+EOF
+
 chmod +x "$PREFIX/termqtt"
 
 echo "Installed to $PREFIX"

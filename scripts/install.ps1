@@ -23,9 +23,17 @@ Invoke-WebRequest -Uri $url -OutFile $zipPath
 New-Item -ItemType Directory -Force -Path $Prefix | Out-Null
 Expand-Archive -Path $zipPath -DestinationPath $temp\unpacked -Force
 
-Copy-Item "$temp\unpacked\termqtt.exe" "$Prefix\termqtt.exe" -Force
+Copy-Item "$temp\unpacked\termqtt.exe" "$Prefix\termqtt-bin.exe" -Force
 Copy-Item "$temp\unpacked\parser.worker.js" "$Prefix\parser.worker.js" -Force
 Copy-Item "$temp\unpacked\tree-sitter.wasm" "$Prefix\tree-sitter.wasm" -Force
+
+$wrapper = @"
+@echo off
+setlocal
+cd /d "%~dp0"
+"%~dp0termqtt-bin.exe" %*
+"@
+Set-Content -Path (Join-Path $Prefix "termqtt.bat") -Value $wrapper -Encoding ASCII
 
 Write-Host "Installed to $Prefix"
 Write-Host "Add to PATH: setx PATH \"$Prefix;$env:PATH\""
