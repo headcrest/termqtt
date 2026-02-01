@@ -40,22 +40,22 @@ jobs:
       - name: Build binary
         run: bun build --compile ./index.tsx --outfile dist/termqtt${{ matrix.os == 'windows' && '.exe' || '' }}
 
-      - name: Copy TreeSitter worker (unix)
+      - name: Bundle TreeSitter worker (unix)
         if: matrix.os != 'windows'
-        run: cp node_modules/@opentui/core/parser.worker.js dist/
+        run: bun build node_modules/@opentui/core/parser.worker.js --target=bun --outdir dist --asset-naming=tree-sitter.[ext]
 
-      - name: Copy TreeSitter worker (windows)
+      - name: Bundle TreeSitter worker (windows)
         if: matrix.os == 'windows'
-        run: Copy-Item node_modules\@opentui\core\parser.worker.js dist\
+        run: bun build node_modules/@opentui/core/parser.worker.js --target=bun --outdir dist --asset-naming=tree-sitter.[ext]
         shell: pwsh
 
       - name: Create zip (unix)
         if: matrix.os != 'windows'
-        run: zip -j dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip dist/termqtt dist/parser.worker.js
+        run: zip -j dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip dist/termqtt dist/parser.worker.js dist/tree-sitter.wasm
 
       - name: Create zip (windows)
         if: matrix.os == 'windows'
-        run: Compress-Archive -Path dist\termqtt.exe,dist\parser.worker.js -DestinationPath dist\termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip -Force
+        run: Compress-Archive -Path dist\termqtt.exe,dist\parser.worker.js,dist\tree-sitter.wasm -DestinationPath dist\termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip -Force
         shell: pwsh
 
       - name: Upload release asset

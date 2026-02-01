@@ -25,6 +25,7 @@ Expand-Archive -Path $zipPath -DestinationPath $temp\unpacked -Force
 
 Copy-Item "$temp\unpacked\termqtt.exe" "$Prefix\termqtt.exe" -Force
 Copy-Item "$temp\unpacked\parser.worker.js" "$Prefix\parser.worker.js" -Force
+Copy-Item "$temp\unpacked\tree-sitter.wasm" "$Prefix\tree-sitter.wasm" -Force
 
 Write-Host "Installed to $Prefix"
 Write-Host "Add to PATH: setx PATH \"$Prefix;$env:PATH\""

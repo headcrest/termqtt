@@ -45,6 +45,7 @@ unzip -oq "$TMPDIR/$ASSET" -d "$TMPDIR/unpacked"
 
 cp "$TMPDIR/unpacked/termqtt" "$PREFIX/termqtt"
 cp "$TMPDIR/unpacked/parser.worker.js" "$PREFIX/parser.worker.js"
+cp "$TMPDIR/unpacked/tree-sitter.wasm" "$PREFIX/tree-sitter.wasm"
 chmod +x "$PREFIX/termqtt"
 
 echo "Installed to $PREFIX"

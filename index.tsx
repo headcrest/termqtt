@@ -11,6 +11,10 @@ const ensureTreeSitterWorker = async () => {
   const bundledWorker = path.join(execDir, "parser.worker.js");
   if (await Bun.file(bundledWorker).exists()) {
     process.env.OTUI_TREE_SITTER_WORKER_PATH = bundledWorker;
+    const bundledWasm = path.join(execDir, "tree-sitter.wasm");
+    if (await Bun.file(bundledWasm).exists()) {
+      process.env.TREE_SITTER_WASM_PATH = bundledWasm;
+    }
     return;
   }
 

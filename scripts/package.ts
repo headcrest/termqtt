@@ -27,7 +27,7 @@ await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });
 
 await Bun.$`bun build --compile ./index.tsx --outfile ${binaryPath}`;
-await Bun.$`cp ${workerPath} ${distDir}`;
-await Bun.$`zip -j ${zipPath} ${binaryPath} ${path.join(distDir, "parser.worker.js")}`;
+await Bun.$`bun build ${workerPath} --target=bun --outdir ${distDir} --asset-naming=tree-sitter.[ext]`;
+await Bun.$`zip -j ${zipPath} ${binaryPath} ${path.join(distDir, "parser.worker.js")} ${path.join(distDir, "tree-sitter.wasm")}`;
 
 console.log(`Built ${zipName}`);
