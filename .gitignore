@@ -5,6 +5,10 @@ node_modules
 out
 dist
 *.tgz
+tmp
+tmp/
+.tmp
+.tmp/
 
 # code coverage
 coverage

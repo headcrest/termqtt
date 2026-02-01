@@ -26,6 +26,7 @@ import {
   type SavedMessage,
 } from "../state";
 import { hasBrokerConfig } from "../storage";
+import { APP_NAME, APP_VERSION } from "../version";
 
 const AppContent = () => {
   const [state, dispatch] = useReducer(reducer, createInitialState());
@@ -282,6 +283,8 @@ const AppContent = () => {
   return (
     <box style={{ width: "100%", height: "100%", flexDirection: "column", backgroundColor: "#0f1117" }}>
       <StatusBar
+        appName={APP_NAME}
+        appVersion={APP_VERSION}
         status={statusLine.status}
         host={statusLine.host}
         search={statusLine.search}

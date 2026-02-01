@@ -1,4 +1,6 @@
 type StatusBarProps = {
+  appName: string;
+  appVersion: string;
   status: string;
   host: string;
   search: string;
@@ -10,6 +12,8 @@ type StatusBarProps = {
 };
 
 export const StatusBar = ({
+  appName,
+  appVersion,
   status,
   host,
   search,
@@ -21,6 +25,7 @@ export const StatusBar = ({
 }: StatusBarProps) => {
   return (
     <box style={{ height: 1, paddingLeft: 1, paddingRight: 1, backgroundColor: "#141824", flexDirection: "row", gap: 2 }}>
+      <text content={`${appName} v${appVersion}`} fg="#e2e8f0" />
       <text content={status} fg={status === "CONNECTED" ? "#22c55e" : "#ef4444"} />
       <text content={`broker:${host}`} fg="#9ca3af" />
       <text content={search} fg={searchActive ? "#f59e0b" : "#9ca3af"} />

@@ -72,7 +72,7 @@ export type StateListener = (state: AppState) => void;
 export const createDefaultBrokerConfig = (): BrokerConfig => ({
   host: "localhost",
   port: 1883,
-  clientId: "termqtt2",
+  clientId: "termqtt",
   username: "",
   password: "",
   topicFilter: "#",

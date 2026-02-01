@@ -1,0 +1,72 @@
+name: release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos
+            arch: x64
+            runner: macos-13
+          - os: macos
+            arch: arm64
+            runner: macos-14
+          - os: linux
+            arch: x64
+            runner: ubuntu-latest
+          - os: windows
+            arch: x64
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build binary
+        run: bun build --compile ./index.tsx --outfile dist/termqtt${{ matrix.os == 'windows' && '.exe' || '' }}
+
+      - name: Copy TreeSitter worker (unix)
+        if: matrix.os != 'windows'
+        run: cp node_modules/@opentui/core/parser.worker.js dist/
+
+      - name: Copy TreeSitter worker (windows)
+        if: matrix.os == 'windows'
+        run: Copy-Item node_modules\@opentui\core\parser.worker.js dist\
+        shell: pwsh
+
+      - name: Create zip (unix)
+        if: matrix.os != 'windows'
+        run: zip -j dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip dist/termqtt dist/parser.worker.js
+
+      - name: Create zip (windows)
+        if: matrix.os == 'windows'
+        run: Compress-Archive -Path dist\termqtt.exe,dist\parser.worker.js -DestinationPath dist\termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip -Force
+        shell: pwsh
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip
+
+      - name: Upload workflow artifact
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: termqtt-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip

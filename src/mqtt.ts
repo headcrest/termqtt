@@ -16,7 +16,7 @@ const buildUrl = (config: BrokerConfig) => {
 };
 
 const buildClientId = (config: BrokerConfig) => {
-  const base = config.clientId?.trim() || "termqtt2";
+  const base = config.clientId?.trim() || "termqtt";
   const host = os.hostname();
   const pid = process.pid;
   return `${base}-${host}-${pid}`;

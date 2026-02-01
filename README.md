@@ -1,4 +1,4 @@
-# termqtt2
+# termqtt
 
 To install dependencies:
 
@@ -10,6 +10,29 @@ To run:
 
 ```bash
 bun run index.tsx
+```
+
+## Install (binary releases)
+
+Each release ships a single zip per OS/arch that contains the binary and the TreeSitter worker.
+
+macOS / Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install.sh | bash -s -- <owner>/<repo>
+```
+
+Windows (PowerShell):
+
+```powershell
+iwr https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install.ps1 -UseBasicParsing -OutFile install.ps1
+./install.ps1 -Repo <owner>/<repo>
+```
+
+## Package locally (macOS)
+
+```bash
+bun run scripts/package.ts
 ```
 
 This project was created using `bun init` in bun v1.3.6. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
