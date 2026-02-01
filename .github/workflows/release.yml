@@ -59,13 +59,15 @@ jobs:
         shell: pwsh
 
       - name: Upload release asset
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          name: ${{ github.event.release.tag_name || github.ref_name }}
           files: dist/termqtt-${{ matrix.os }}-${{ matrix.arch }}.zip
 
       - name: Upload workflow artifact
-        if: github.event_name != 'release'
+        if: github.event_name != 'release' && !startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
         with:
           name: termqtt-${{ matrix.os }}-${{ matrix.arch }}
