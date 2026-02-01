@@ -80,6 +80,25 @@ On first run (or any time later), press `b` to configure the broker.
 Configuration is saved under `$XDG_CONFIG_HOME/termqtt` (or `~/.config/termqtt`).
 On Windows it uses `%APPDATA%\termqtt`.
 
+## CLI flags
+
+```bash
+termqtt --help
+termqtt --version
+termqtt -b localhost -P 1883 -r sensors/#
+termqtt --broker mqtt.example.com --tls --user alice --password secret -r devices/#
+```
+
+Flags:
+- `-h`, `--help` show help
+- `-v`, `--version` show version
+- `-b`, `--broker` broker host
+- `-P`, `--port` broker port
+- `-u`, `--user` username
+- `-w`, `--password` password
+- `-t`, `--tls` enable TLS
+- `-r`, `--root-topic` root topic (subscribe filter)
+
 ## User Guide
 
 ### Layout Overview

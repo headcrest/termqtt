@@ -81,8 +81,24 @@ export const createDefaultBrokerConfig = (): BrokerConfig => ({
   qos: 0,
 });
 
+const resolveDefaultBrokerConfig = () => {
+  const defaults = createDefaultBrokerConfig();
+  const rootTopic = Bun.env.TERMOTTQ_ROOT_TOPIC || defaults.topicFilter;
+  const port = Bun.env.TERMOTTQ_PORT ? Number(Bun.env.TERMOTTQ_PORT) : defaults.port;
+  return {
+    ...defaults,
+    host: Bun.env.TERMOTTQ_BROKER || defaults.host,
+    port: Number.isFinite(port) ? port : defaults.port,
+    username: Bun.env.TERMOTTQ_USER || defaults.username,
+    password: Bun.env.TERMOTTQ_PASSWORD || defaults.password,
+    tls: Bun.env.TERMOTTQ_TLS === "true" || defaults.tls,
+    topicFilter: rootTopic,
+    defaultTopic: rootTopic,
+  };
+};
+
 export const createInitialState = (): AppState => ({
-  broker: createDefaultBrokerConfig(),
+  broker: resolveDefaultBrokerConfig(),
   connectionStatus: "disconnected",
   messageCount: 0,
   debugKeys: false,

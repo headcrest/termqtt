@@ -1,2 +1,4 @@
-export const APP_NAME = "termqtt";
-export const APP_VERSION = "0.1.0";
+import packageJson from "../package.json";
+
+export const APP_NAME = packageJson.name;
+export const APP_VERSION = packageJson.version;
