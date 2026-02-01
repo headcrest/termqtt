@@ -15,9 +15,6 @@ jobs:
       matrix:
         include:
           - os: macos
-            arch: x64
-            runner: macos-13
-          - os: macos
             arch: arm64
             runner: macos-14
           - os: linux
