@@ -38,14 +38,14 @@ Each release ships a single zip per OS/arch that contains the binary and the Tre
 macOS / Linux:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install.sh | bash -s -- <owner>/<repo>
+curl -fsSL https://raw.githubusercontent.com/headcrest/termqtt/main/scripts/install.sh | bash -s -- headcrest/termqtt
 ```
 
 Windows (PowerShell):
 
 ```powershell
-iwr https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install.ps1 -UseBasicParsing -OutFile install.ps1
-./install.ps1 -Repo <owner>/<repo>
+iwr https://raw.githubusercontent.com/headcrest/termqtt/main/scripts/install.ps1 -UseBasicParsing -OutFile install.ps1
+./install.ps1 -Repo headcrest/termqtt
 ```
 
 ## Quick Start (dev)
