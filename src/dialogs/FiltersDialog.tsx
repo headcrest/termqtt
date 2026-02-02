@@ -3,6 +3,7 @@ import type { KeyEvent, SelectOption } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import type { ExcludeFilter } from "../state";
 import { useDialog } from "./DialogContext";
+import { addFilter, buildFilterOptionName, deleteFilter, editFilter, toggleFilter } from "./filtersLogic";
 
 type FiltersDialogProps = {
   initialFilters: ExcludeFilter[];
@@ -19,7 +20,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
   const options: SelectOption[] = useMemo(
     () =>
       filters.map((filter) => ({
-        name: `${filter.enabled ? "[x]" : "[ ]"} ${filter.pattern || "(empty)"}`,
+        name: buildFilterOptionName(filter),
         description: "",
       })),
     [filters],
@@ -51,13 +52,9 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
           const value = promptValue.trim();
           if (value) {
             if (promptMode === "add") {
-              setFilters((current) => [...current, { pattern: value, enabled: true }]);
+              setFilters((current) => addFilter(current, value));
             } else {
-              setFilters((current) =>
-                current.map((entry, idx) =>
-                  idx === selectedIndex ? { ...entry, pattern: value } : entry,
-                ),
-              );
+              setFilters((current) => editFilter(current, selectedIndex, value));
             }
           }
           setPromptValue("");
@@ -73,11 +70,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
         return true;
       }
       if (key.name === "space") {
-        setFilters((current) =>
-          current.map((entry, idx) =>
-            idx === selectedIndex ? { ...entry, enabled: !entry.enabled } : entry,
-          ),
-        );
+        setFilters((current) => toggleFilter(current, selectedIndex));
         return true;
       }
       if (key.name === "a") {
@@ -89,7 +82,7 @@ export const FiltersDialog = ({ initialFilters, onSave }: FiltersDialogProps) =>
         return true;
       }
       if (key.name === "d") {
-        setFilters((current) => current.filter((_, idx) => idx !== selectedIndex));
+        setFilters((current) => deleteFilter(current, selectedIndex));
         return true;
       }
       return false;

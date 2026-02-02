@@ -175,6 +175,20 @@ On Windows it uses `%APPDATA%\termqtt`.
 - Can’t connect: press `b`, verify host/port/credentials, and confirm broker is running.
 - Watchlist or favourites not saving: check file permissions in the config directory.
 
+## Reporting Bugs
+Please open a GitHub issue with:
+- Steps to reproduce
+- Expected vs actual behavior
+- Your OS, terminal, and termqtt version
+- Any relevant logs or screenshots
+
+## Contributing
+Pull requests are welcome.
+1. Fork the repo and create a feature branch.
+2. Make your changes with tests where appropriate.
+3. Run `bun test` locally.
+4. Open a PR describing the change and reasoning.
+
 ## Architecture
 
 - CLI UI built with `@opentui/react` and `@opentui/core`
@@ -241,4 +255,4 @@ bun run scripts/package.ts
 ```
 
 ## License
-Add license details here.
+MIT
