@@ -14,7 +14,7 @@ filter, watch, favorite, and publish JSON payloads without leaving the terminal.
 
 ## Screenshots & Demo
 Drop screenshots or a short demo GIF in an `assets/` folder (recommended).
-
+![Image](https://github.com/user-attachments/assets/211a27dc-c17d-4f73-8e55-ff73de41c0e3)
 Placeholders (replace with real captures):
 ![termqtt overview](assets/overview.png)
 ![Edit dialog](assets/edit-dialog.png)
