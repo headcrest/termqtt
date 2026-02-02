@@ -13,8 +13,7 @@ filter, watch, favorite, and publish JSON payloads without leaving the terminal.
 - Persistent broker config, exclude filters, watchlist, favourites, and saved messages.
 
 ## Screenshots & Demo
-https://github.com/user-attachments/assets/73c5dfb9-bdf3-4c39-afb7-9bbb761d8d99
-![Image](https://github.com/user-attachments/assets/211a27dc-c17d-4f73-8e55-ff73de41c0e3)
+![Image](https://github.com/user-attachments/assets/dbdb1040-0df8-486f-adac-f53c9f5f9eb3)
 
 Drop screenshots or a short demo GIF in an `assets/` folder (recommended).
 
