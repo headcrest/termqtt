@@ -12,7 +12,7 @@ type WatchlistPaneProps = {
 export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange }: WatchlistPaneProps) => {
   return (
     <box
-      title={`5 Watchlist (${count})`}
+      title={`[5] Watchlist (${count})`}
       border
       style={{
         height: "100%",

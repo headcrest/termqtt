@@ -9,6 +9,7 @@ type StatusBarProps = {
   excludesActive: boolean;
   error: string;
   debug: string;
+  paused: boolean;
 };
 
 export const StatusBar = ({
@@ -22,11 +23,15 @@ export const StatusBar = ({
   excludesActive,
   error,
   debug,
+  paused,
 }: StatusBarProps) => {
   return (
     <box style={{ height: 1, paddingLeft: 1, paddingRight: 1, backgroundColor: "#141824", flexDirection: "row", gap: 2 }}>
       <text content={`${appName} v${appVersion}`} fg="#e2e8f0" />
-      <text content={status} fg={status === "CONNECTED" ? "#22c55e" : "#ef4444"} />
+      <box style={{ flexDirection: "row", gap: 1 }}>
+        <text content={status} fg={status === "CONNECTED" ? "#22c55e" : "#ef4444"} />
+        {paused ? <text content="PAUSED" fg="#f59e0b" /> : null}
+      </box>
       <text content={`broker:${host}`} fg="#9ca3af" />
       <text content={search} fg={searchActive ? "#f59e0b" : "#9ca3af"} />
       <text content={excludes} fg={excludesActive ? "#ef4444" : "#9ca3af"} />

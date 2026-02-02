@@ -166,6 +166,7 @@ export const getStatusLine = (state: AppState) => {
     excludesActive: excludesCount > 0,
     error,
     debug,
+    paused: state.connectionStatus === "connected" && state.updatesPaused,
   };
 };
 

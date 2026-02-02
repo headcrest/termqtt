@@ -16,7 +16,7 @@ const ensureDefaultFilters = (filters: ExcludeFilter[]) => {
   const existing = new Map(filters.map((filter) => [filter.pattern, filter]));
   for (const pattern of defaults) {
     if (!existing.has(pattern)) {
-      existing.set(pattern, { pattern, enabled: true });
+      existing.set(pattern, { pattern, enabled: false });
     }
   }
   return Array.from(existing.values());
@@ -54,7 +54,7 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
         watchlist: state.watchlist,
         savedMessages: state.savedMessages,
         excludeFilters: state.excludeFilters,
-      });
+      }, state.broker);
       dispatch({
         type: "hydrate",
         data: {
@@ -67,7 +67,7 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
       });
     };
     void load();
-  }, []);
+  }, [state.broker.host, state.broker.port]);
 
   useEffect(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -78,7 +78,7 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
         watchlist: state.watchlist,
         savedMessages: state.savedMessages,
         excludeFilters: state.excludeFilters,
-      });
+      }, state.broker);
     }, 250);
   }, [state.broker, state.favourites, state.watchlist, state.savedMessages, state.excludeFilters]);
 };

@@ -20,7 +20,7 @@ export const FavouritesPane = ({
 }: FavouritesPaneProps) => {
   return (
     <box
-      title={`4 Favourites (${count})`}
+      title={`[4] Favourites (${count})`}
       border
       style={{
         height: "100%",

@@ -175,6 +175,10 @@ export const useKeyboardShortcuts = ({
       openDialog({ type: "broker" });
       return;
     }
+    if (key.name === "p") {
+      dispatch({ type: "set", data: { updatesPaused: !state.updatesPaused } });
+      return;
+    }
 
     if (isShiftTab(key)) {
       const order: AppState["activePane"][] = ["topics", "payload", "details", "favourites", "watchlist"];

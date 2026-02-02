@@ -45,6 +45,7 @@ export type AppState = {
   broker: BrokerConfig;
   connectionStatus: "disconnected" | "connecting" | "connected" | "error";
   connectionError?: string;
+  updatesPaused: boolean;
   messageCount: number;
   lastMessageTopic?: string;
   lastMessageAt?: number;
@@ -102,6 +103,7 @@ export const createInitialState = (): AppState => ({
   connectionStatus: "disconnected",
   messageCount: 0,
   debugKeys: false,
+  updatesPaused: false,
   topicExpansion: {},
   topics: [],
   messages: {},
@@ -109,9 +111,9 @@ export const createInitialState = (): AppState => ({
   watchlist: [],
   savedMessages: [],
   excludeFilters: [
-    { pattern: "read", enabled: true },
-    { pattern: "data", enabled: true },
-    { pattern: "config", enabled: true },
+    { pattern: "read", enabled: false },
+    { pattern: "data", enabled: false },
+    { pattern: "config", enabled: false },
   ],
   searchQuery: "",
   selectedTopicIndex: 0,

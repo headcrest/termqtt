@@ -45,7 +45,8 @@ const AppContent = () => {
   const detailsContent = useMemo(() => getDetailsContent(selectedMessage), [selectedMessage]);
   const statusLine = useMemo(() => getStatusLine(state), [state]);
   const shortcutLine = useMemo(() => {
-    const global = "tab/shift+tab cycle | 1-5 focus | n publish new | b broker | / search | f filters | ? help | q quit";
+    const pauseLabel = state.updatesPaused ? "p resume" : "p pause";
+    const global = `tab/shift+tab cycle | 1-5 focus | n publish new | ${pauseLabel} | b broker | / search | f filters | ? help | q quit`;
     const perPane: Record<AppState["activePane"], string> = {
       topics: "j/k move | h/l collapse/expand | space favourite",
       favourites: "j/k move | space remove | r rename | enter select",
@@ -54,7 +55,7 @@ const AppContent = () => {
       details: "e edit",
     };
     return `Shortcuts: ${perPane[state.activePane]} | ${global}`;
-  }, [state.activePane]);
+  }, [state.activePane, state.updatesPaused]);
 
   useKeyboardShortcuts({
     state,
@@ -293,6 +294,7 @@ const AppContent = () => {
         excludesActive={statusLine.excludesActive}
         error={statusLine.error}
         debug={statusLine.debug}
+        paused={statusLine.paused}
       />
       <PaneLayout
         activePane={state.activePane}

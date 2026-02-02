@@ -12,7 +12,7 @@ type DetailsPaneProps = {
 export const DetailsPane = ({ title, content, isJson, focused }: DetailsPaneProps) => {
   return (
     <box
-      title={`3 ${title}`}
+      title={`[3] ${title}`}
       border
       style={{
         flexGrow: 1,

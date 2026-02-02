@@ -75,12 +75,17 @@ const parseValue = (value: string) => {
 
 const parsePath = (path: string): Array<string | number> => {
   const tokens: Array<string | number> = [];
+  const normalized = path
+    .trim()
+    .replace(/\s*\.\s*/g, ".")
+    .replace(/\s*\[\s*/g, "[")
+    .replace(/\s*\]\s*/g, "]");
   const pattern = /([^.[\]]+)|\[(\d+)\]/g;
-  let match: RegExpExecArray | null = pattern.exec(path);
+  let match: RegExpExecArray | null = pattern.exec(normalized);
   while (match) {
     if (match[1]) tokens.push(match[1]);
     if (match[2]) tokens.push(Number(match[2]));
-    match = pattern.exec(path);
+    match = pattern.exec(normalized);
   }
   return tokens;
 };
@@ -159,6 +164,38 @@ const buildPayloadFromRows = (rows: TableRow[], rawPayload: boolean) => {
   return JSON.stringify(root ?? {}, null, 2);
 };
 
+const buildPreviewFromRows = (rows: TableRow[], rawPayload: boolean) => {
+  if (rawPayload && rows.length === 1 && rows[0]?.key === "payload") {
+    return rows[0].value;
+  }
+
+  const normalizedKeys = rows
+    .filter((row) => row.key.trim().length > 0 && row.value.trim().length > 0)
+    .map((row) => row.key.trim());
+
+  let root: unknown = undefined;
+  for (const row of rows) {
+    const key = row.key.trim();
+    if (!key) continue;
+    if (row.value.trim().length === 0) continue;
+    if (normalizedKeys.some((other) => other !== key && (other.startsWith(`${key}.`) || other.startsWith(`${key}[`)))) {
+      continue;
+    }
+    const tokens = parsePath(key);
+    const value = parseValue(row.value);
+    if (tokens.length === 0) {
+      root = value;
+      continue;
+    }
+    if (root === undefined) {
+      root = typeof tokens[0] === "number" ? [] : {};
+    }
+    root = setByTokens(root, tokens, value);
+  }
+
+  return root === undefined ? "" : JSON.stringify(root, null, 2);
+};
+
 export const MessageDialog = ({
   mode,
   initialTopic,
@@ -205,7 +242,7 @@ export const MessageDialog = ({
     [savedMessages],
   );
 
-  const previewPayload = useMemo(() => buildPayloadFromRows(rows, rawPayload), [rows, rawPayload]);
+  const previewPayload = useMemo(() => buildPreviewFromRows(rows, rawPayload), [rows, rawPayload]);
   const previewParsed = useMemo(() => parseJson(previewPayload), [previewPayload]);
   const previewContent = useMemo(() => {
     if (previewParsed.ok) return JSON.stringify(previewParsed.value, null, 2);

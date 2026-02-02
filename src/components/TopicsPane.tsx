@@ -20,7 +20,7 @@ export const TopicsPane = ({
 }: TopicsPaneProps) => {
   return (
     <box
-      title={`1 Topics (${count})`}
+      title={`[1] Topics (${count})`}
       border
       style={{
         height: "100%",

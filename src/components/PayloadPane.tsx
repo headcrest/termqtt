@@ -54,7 +54,7 @@ export const PayloadPane = ({ entries, selectedIndex, focused, count, onChange }
 
   return (
     <box
-      title={`2 Payload (${count})`}
+      title={`[2] Payload (${count})`}
       border
       style={{
         height: "100%",

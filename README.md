@@ -92,6 +92,7 @@ termqtt --broker mqtt.example.com --tls --user alice --password secret -r device
 Flags:
 - `-h`, `--help` show help
 - `-v`, `--version` show version
+- `--clear-storage [glob]` delete local config files (with prompt)
 - `-b`, `--broker` broker host
 - `-P`, `--port` broker port
 - `-u`, `--user` username
@@ -189,11 +190,11 @@ Same controls as Edit dialog.
 ## Persistence
 termqtt stores local data under `$XDG_CONFIG_HOME/termqtt` (or `~/.config/termqtt`).
 On Windows it uses `%APPDATA%\termqtt`.
-- `termqtt_broker.json` broker configuration
-- `termqtt_watchlist.json` watchlist entries
-- `termqtt_favourites.json` favourite topics
-- `termqtt_saved_messages.json` saved messages library
-- `termqtt_filters.json` exclude filters
+- `termqtt_broker.json` broker configuration (global)
+- `broker_<host>_<port>_termqtt_watchlist.json` watchlist entries
+- `broker_<host>_<port>_termqtt_favourites.json` favourite topics
+- `broker_<host>_<port>_termqtt_saved_messages.json` saved messages library
+- `broker_<host>_<port>_termqtt_filters.json` exclude filters
 
 ## Troubleshooting
 - Terminal not restored: run `reset`.

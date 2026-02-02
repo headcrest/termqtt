@@ -25,6 +25,7 @@ export const reducer = (state: AppState, action: Action): AppState => {
         subscriptionInfo: action.info,
       };
     case "message": {
+      if (state.updatesPaused) return state;
       const parsed = parseJson(action.payload);
       const nextMessages: Record<string, TopicMessage> = {
         ...state.messages,

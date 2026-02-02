@@ -2,8 +2,11 @@ import { createCliRenderer, getTreeSitterClient } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readdir, rm } from "node:fs/promises";
+import readline from "node:readline/promises";
 import { App } from "./src/app/App";
 import { APP_VERSION } from "./src/version";
+import { getConfigDir } from "./src/storage";
 
 type CliOverrides = {
   broker?: string;
@@ -14,11 +17,17 @@ type CliOverrides = {
   rootTopic?: string;
 };
 
+type ClearStorageOptions = {
+  enabled: boolean;
+  pattern?: string;
+};
+
 const parseArgs = () => {
   const args = Bun.argv.slice(2);
   const overrides: CliOverrides = {};
   let showHelp = false;
   let showVersion = false;
+  const clearStorage: ClearStorageOptions = { enabled: false };
 
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -30,6 +39,20 @@ const parseArgs = () => {
     }
     if (arg === "--version" || arg === "-v") {
       showVersion = true;
+      continue;
+    }
+    if (arg === "--clear-storage") {
+      clearStorage.enabled = true;
+      const next = args[i + 1];
+      if (next && !next.startsWith("-")) {
+        clearStorage.pattern = next;
+        i += 1;
+      }
+      continue;
+    }
+    if (arg.startsWith("--clear-storage=")) {
+      clearStorage.enabled = true;
+      clearStorage.pattern = arg.split("=").slice(1).join("=") || undefined;
       continue;
     }
     if (arg === "--tls" || arg === "-t") {
@@ -65,7 +88,7 @@ const parseArgs = () => {
     }
   }
 
-  return { overrides, showHelp, showVersion };
+  return { overrides, showHelp, showVersion, clearStorage };
 };
 
 const printHelp = () => {
@@ -77,6 +100,7 @@ Usage:
 Options:
   -h, --help               Show help
   -v, --version            Show version
+  --clear-storage [glob]   Delete local config files (optional glob)
   -b, --broker <host>      Broker host
   -P, --port <port>        Broker port
   -u, --user <user>        Username
@@ -117,7 +141,7 @@ const ensureTreeSitterWorker = async () => {
   }
 };
 
-const { overrides, showHelp, showVersion } = parseArgs();
+const { overrides, showHelp, showVersion, clearStorage } = parseArgs();
 
 if (showVersion) {
   console.log(APP_VERSION);
@@ -126,6 +150,34 @@ if (showVersion) {
 
 if (showHelp) {
   printHelp();
+  process.exit(0);
+}
+
+const matchesPattern = (name: string, pattern: string) => {
+  const escaped = pattern.replace(/([.+^=!:${}()|[\]\\])/g, "\\$1");
+  const regex = new RegExp(`^${escaped.replace(/\*/g, ".*").replace(/\?/g, ".")}$`);
+  return regex.test(name);
+};
+
+if (clearStorage.enabled) {
+  const dir = getConfigDir();
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const files = await readdir(dir).catch(() => [] as string[]);
+  const targets = clearStorage.pattern
+    ? files.filter((file) => matchesPattern(file, clearStorage.pattern || ""))
+    : files;
+  const label = clearStorage.pattern ? `matching '${clearStorage.pattern}'` : "in this directory";
+  const answer = await rl.question(
+    `This will delete ${targets.length} config file(s) ${label} in ${dir}. Proceed? [y/N] `,
+  );
+  rl.close();
+  const ok = answer.trim().toLowerCase();
+  if (ok !== "y" && ok !== "yes") {
+    console.log("Aborted.");
+    process.exit(0);
+  }
+  await Promise.all(targets.map((file) => rm(path.join(dir, file), { force: true })));
+  console.log("Config files removed.");
   process.exit(0);
 }
 
