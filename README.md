@@ -12,26 +12,8 @@ filter, watch, favorite, and publish JSON payloads without leaving the terminal.
 - Saved messages library for quick re-use.
 - Persistent broker config, exclude filters, watchlist, favourites, and saved messages.
 
-## Screenshots & Demo
-![Image](https://github.com/user-attachments/assets/dbdb1040-0df8-486f-adac-f53c9f5f9eb3)
-
-Drop screenshots or a short demo GIF in an `assets/` folder (recommended).
-
-Placeholders (replace with real captures):
-![termqtt overview](assets/overview.png)
-![Edit dialog](assets/edit-dialog.png)
-![New message dialog](assets/new-message.png)
-![Help dialog](assets/help-dialog.png)
-![termqtt demo](assets/demo.gif)
-
-Suggested capture list:
-- Overview: all panes with active connection and a few topics.
-- Search + filters: `/` search active and filter status in header.
-- Favourites + watchlist: starred topic and watched keys with values.
-- Details view: JSON pretty-printing with syntax color.
-- Edit dialog: key/value edit with preview and saved messages list.
-- New message dialog: key/value editing with preview.
-- Help dialog: context help overlay.
+## Demo
+![Image](https://github.com/user-attachments/assets/6a2b172b-2637-4736-88e1-b99598c3a2be)
 
 ## Install (binary releases)
 
