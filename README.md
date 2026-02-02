@@ -48,32 +48,6 @@ iwr https://raw.githubusercontent.com/headcrest/termqtt/main/scripts/install.ps1
 ./install.ps1 -Repo headcrest/termqtt
 ```
 
-## Quick Start (dev)
-
-Install dependencies:
-
-```bash
-bun install
-```
-
-Run:
-
-```bash
-bun run index.tsx
-```
-
-Build compiled binary:
-
-```bash
-bun build --compile ./index.tsx --outfile dist/termqtt
-```
-
-Package zip (local):
-
-```bash
-bun run scripts/package.ts
-```
-
 ## Broker Setup
 
 On first run (or any time later), press `b` to configure the broker.
@@ -242,12 +216,28 @@ flowchart TD
 
 ## Development
 
-```bash
-# Run in dev
-bun run index.tsx
+Install dependencies:
 
-# Run tests
-bun test
+```bash
+bun install
+```
+
+Run:
+
+```bash
+bun run index.tsx
+```
+
+Build compiled binary:
+
+```bash
+bun build --compile ./index.tsx --outfile dist/termqtt
+```
+
+Package zip (local):
+
+```bash
+bun run scripts/package.ts
 ```
 
 ## License
