@@ -68,7 +68,7 @@ export const PaneLayout = ({
             onSelect={onTopicSelect}
           />
         </box>
-        <box style={{ width: 60 }}>
+        <box style={{ flexGrow: 1 }}>
           <PayloadPane
             entries={payloadEntries}
             selectedIndex={selectedPayloadIndex}

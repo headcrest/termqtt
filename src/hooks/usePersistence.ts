@@ -45,6 +45,7 @@ const normalizeBrokerConfig = (value: unknown, fallback: BrokerConfig): BrokerCo
 
 export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didInitialLoad = useRef(false);
 
   useEffect(() => {
     const load = async () => {
@@ -58,13 +59,16 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
       dispatch({
         type: "hydrate",
         data: {
-          broker: normalizeBrokerConfig(loaded.broker, state.broker),
+          broker: didInitialLoad.current
+            ? state.broker
+            : normalizeBrokerConfig(loaded.broker, state.broker),
           favourites: loaded.favourites,
           watchlist: loaded.watchlist,
           savedMessages: loaded.savedMessages,
           excludeFilters: ensureDefaultFilters(loaded.excludeFilters),
         },
       });
+      didInitialLoad.current = true;
     };
     void load();
   }, [state.broker.host, state.broker.port]);
