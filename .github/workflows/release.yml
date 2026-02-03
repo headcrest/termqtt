@@ -1,9 +1,6 @@
 name: release
 
-on:
-  push:
-    tags:
-      - "v*"
+on: 
   release:
     types: [published]
   workflow_dispatch:
