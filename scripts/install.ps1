@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory = $true)][string]$Repo,
   [string]$Version = "latest",
-  [string]$Prefix = "$env:USERPROFILE\.termqtt"
+  [string]$Prefix = "$env:LOCALAPPDATA\Programs\termqtt"
 )
 
 $os = "windows"
@@ -36,4 +36,13 @@ cd /d "%~dp0"
 Set-Content -Path (Join-Path $Prefix "termqtt.bat") -Value $wrapper -Encoding ASCII
 
 Write-Host "Installed to $Prefix"
-Write-Host "Add to PATH: setx PATH \"$Prefix;$env:PATH\"
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+if (-not $userPath) { $userPath = "" }
+if ($userPath -notlike "*$Prefix*") {
+  $newPath = if ($userPath) { "$Prefix;$userPath" } else { $Prefix }
+  [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+  $env:Path = "$Prefix;$env:Path"
+  Write-Host "Added $Prefix to user PATH"
+} else {
+  Write-Host "PATH already contains $Prefix"
+}
