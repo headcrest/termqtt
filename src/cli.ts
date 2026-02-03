@@ -17,12 +17,16 @@ export type CliParseResult = {
   showHelp: boolean;
   showVersion: boolean;
   clearStorage: ClearStorageOptions;
+  upgrade: boolean;
+  yes: boolean;
 };
 
 export const parseArgs = (args: string[]): CliParseResult => {
   const overrides: CliOverrides = {};
   let showHelp = false;
   let showVersion = false;
+  let upgrade = false;
+  let yes = false;
   const clearStorage: ClearStorageOptions = { enabled: false };
 
   for (let i = 0; i < args.length; i += 1) {
@@ -35,6 +39,14 @@ export const parseArgs = (args: string[]): CliParseResult => {
     }
     if (arg === "--version" || arg === "-v") {
       showVersion = true;
+      continue;
+    }
+    if (arg === "--upgrade") {
+      upgrade = true;
+      continue;
+    }
+    if (arg === "--yes" || arg === "-y") {
+      yes = true;
       continue;
     }
     if (arg === "--tls" || arg === "-t") {
@@ -85,7 +97,7 @@ export const parseArgs = (args: string[]): CliParseResult => {
     }
   }
 
-  return { overrides, showHelp, showVersion, clearStorage };
+  return { overrides, showHelp, showVersion, clearStorage, upgrade, yes };
 };
 
 export const formatHelp = (version: string) => `termqtt v${version}
@@ -96,6 +108,8 @@ Usage:
 Options:
   -h, --help               Show help
   -v, --version            Show version
+  --upgrade                Upgrade to latest release
+  -y, --yes                Skip confirmation prompts
   --clear-storage [glob]   Delete local config files (optional glob)
   -b, --broker <host>      Broker host
   -P, --port <port>        Broker port

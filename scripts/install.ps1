@@ -36,4 +36,4 @@ cd /d "%~dp0"
 Set-Content -Path (Join-Path $Prefix "termqtt.bat") -Value $wrapper -Encoding ASCII
 
 Write-Host "Installed to $Prefix"
-Write-Host "Add to PATH: setx PATH \"$Prefix;$env:PATH\""
+Write-Host "Add to PATH: setx PATH \"$Prefix;$env:PATH\"

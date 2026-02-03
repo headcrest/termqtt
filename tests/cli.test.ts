@@ -22,6 +22,12 @@ describe("parseArgs", () => {
     const result = parseArgs(["--clear-storage=broker_*"]);
     expect(result.clearStorage.pattern).toBe("broker_*");
   });
+
+  test("parses upgrade and yes", () => {
+    const result = parseArgs(["--upgrade", "-y"]);
+    expect(result.upgrade).toBe(true);
+    expect(result.yes).toBe(true);
+  });
 });
 
 describe("matchesPattern", () => {

@@ -50,6 +50,8 @@ termqtt --broker mqtt.example.com --tls --user alice --password secret -r device
 Flags:
 - `-h`, `--help` show help
 - `-v`, `--version` show version
+- `--upgrade` upgrade to latest release (prompted)
+- `-y`, `--yes` skip confirmation prompts
 - `--clear-storage [glob]` delete local config files (with prompt)
 - `-b`, `--broker` broker host
 - `-P`, `--port` broker port
