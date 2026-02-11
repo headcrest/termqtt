@@ -20,6 +20,7 @@ export const useMqtt = (broker: BrokerConfig, dispatch: Dispatch<Action>) => {
   }, [broker, dispatch]);
 
   const publish = (topic: string, payload: string) => {
+    payload = payload + "\n";
     mqttRef.current?.publish(topic, payload);
   };
 
