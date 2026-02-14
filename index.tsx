@@ -179,6 +179,9 @@ if (overrides.user !== undefined) process.env.TERMOTTQ_USER = overrides.user;
 if (overrides.password !== undefined) process.env.TERMOTTQ_PASSWORD = overrides.password;
 if (overrides.tls) process.env.TERMOTTQ_TLS = "true";
 if (overrides.rootTopic) process.env.TERMOTTQ_ROOT_TOPIC = overrides.rootTopic;
+if (overrides.extraTopics && overrides.extraTopics.length > 0) {
+  process.env.TERMOTTQ_EXTRA_TOPICS = overrides.extraTopics.join(",");
+}
 
 await ensureTreeSitterWorker();
 const renderer = await createCliRenderer({ exitOnCtrlC: true });

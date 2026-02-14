@@ -28,6 +28,18 @@ describe("parseArgs", () => {
     expect(result.upgrade).toBe(true);
     expect(result.yes).toBe(true);
   });
+
+  test("parses multiple root topics", () => {
+    const result = parseArgs(["-r", "sensors/#", "-r", "devices/#", "-r", "alerts/#"]);
+    expect(result.overrides.rootTopic).toBe("sensors/#");
+    expect(result.overrides.extraTopics).toEqual(["devices/#", "alerts/#"]);
+  });
+
+  test("single root topic produces no extraTopics", () => {
+    const result = parseArgs(["-r", "sensors/#"]);
+    expect(result.overrides.rootTopic).toBe("sensors/#");
+    expect(result.overrides.extraTopics).toBeUndefined();
+  });
 });
 
 describe("matchesPattern", () => {

@@ -9,6 +9,16 @@ type BrokerDialogProps = {
   onSave: (broker: BrokerConfig) => void;
 };
 
+/** Serialize extra topic filters as a comma-separated string for display in the input. */
+const filtersToString = (filters: string[]): string => filters.join(", ");
+
+/** Parse a comma-separated or newline-separated string into a topic filter list. */
+const stringToFilters = (value: string): string[] =>
+  value
+    .split(/[,\n]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
 export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
   const { closeDialog } = useDialog();
   const [broker, setBroker] = useState<BrokerConfig>(initialBroker);
@@ -41,6 +51,12 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         label: "Root topic",
         value: broker.topicFilter,
         set: (value: string) => setBroker((prev) => ({ ...prev, topicFilter: value })),
+      },
+      {
+        label: "Extra topics (comma-sep)",
+        value: filtersToString(broker.topicFilters),
+        set: (value: string) =>
+          setBroker((prev) => ({ ...prev, topicFilters: stringToFilters(value) })),
       },
       {
         label: "TLS (true/false)",
@@ -98,6 +114,8 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
     handleKey(key);
   });
 
+  const activeFilterCount = broker.topicFilters.filter((f) => f.trim().length > 0).length + 1;
+
   return (
     <box
       title="Broker Configuration"
@@ -105,7 +123,7 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
       style={{
         position: "absolute",
         width: "70%",
-        height: "70%",
+        height: "80%",
         left: "15%",
         top: "10%",
         borderStyle: "double",
@@ -147,6 +165,12 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
           ))}
         </box>
       </scrollbox>
+      {activeFilterCount > 1 && (
+        <text
+          content={`Subscribing to ${activeFilterCount} topic filters`}
+          fg="#60a5fa"
+        />
+      )}
       <text
         content="Tab/Shift+Tab fields • Enter save • Esc close"
         fg="#94a3b8"

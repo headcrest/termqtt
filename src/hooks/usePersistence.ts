@@ -28,6 +28,9 @@ const normalizeBrokerConfig = (value: unknown, fallback: BrokerConfig): BrokerCo
   const port = Number(partial.port ?? fallback.port);
   const qosValue = Number(partial.qos ?? fallback.qos);
   const qos = qosValue === 1 || qosValue === 2 ? (qosValue as 1 | 2) : 0;
+  const topicFilters = Array.isArray(partial.topicFilters)
+    ? (partial.topicFilters as unknown[]).filter((f): f is string => typeof f === "string")
+    : fallback.topicFilters;
   return {
     ...fallback,
     ...partial,
@@ -37,6 +40,7 @@ const normalizeBrokerConfig = (value: unknown, fallback: BrokerConfig): BrokerCo
     username: typeof partial.username === "string" ? partial.username : fallback.username,
     password: typeof partial.password === "string" ? partial.password : fallback.password,
     topicFilter: typeof partial.topicFilter === "string" ? partial.topicFilter : fallback.topicFilter,
+    topicFilters,
     defaultTopic: typeof partial.defaultTopic === "string" ? partial.defaultTopic : fallback.defaultTopic,
     tls: typeof partial.tls === "boolean" ? partial.tls : fallback.tls,
     qos,

@@ -5,6 +5,8 @@ export type CliOverrides = {
   password?: string;
   tls?: boolean;
   rootTopic?: string;
+  /** Additional topic subscriptions (beyond the primary rootTopic). */
+  extraTopics?: string[];
 };
 
 export type ClearStorageOptions = {
@@ -91,7 +93,13 @@ export const parseArgs = (args: string[]): CliParseResult => {
       continue;
     }
     if (arg === "--root-topic" || arg === "-r") {
-      if (next) overrides.rootTopic = next;
+      if (next) {
+        if (!overrides.rootTopic) {
+          overrides.rootTopic = next;
+        } else {
+          overrides.extraTopics = [...(overrides.extraTopics ?? []), next];
+        }
+      }
       i += 1;
       continue;
     }
@@ -116,10 +124,11 @@ Options:
   -u, --user <user>        Username
   -w, --password <pass>    Password
   -t, --tls                Enable TLS
-  -r, --root-topic <topic> Root topic (subscribe filter)
+  -r, --root-topic <topic> Root topic (subscribe filter); repeat for multiple
 
 Examples:
   termqtt -b localhost -P 1883 -r sensors/#
+  termqtt -b localhost -r sensors/# -r devices/# -r alerts/#
   termqtt --broker mqtt.example.com --tls --user alice --password secret -r devices/#
 `;
 

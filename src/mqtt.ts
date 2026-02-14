@@ -40,6 +40,15 @@ export class MqttManager {
     this.handlers = handlers;
   }
 
+  /** Returns the deduplicated list of topic filters to subscribe to. */
+  private getActiveFilters(): string[] {
+    const primary = this.config.topicFilter?.trim() || "#";
+    const extras = (this.config.topicFilters ?? [])
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0 && f !== primary);
+    return [primary, ...extras];
+  }
+
   connect() {
     this.handlers.onStatus("connecting");
     const url = buildUrl(this.config);
@@ -49,35 +58,58 @@ export class MqttManager {
 
     client.on("connect", () => {
       this.handlers.onStatus("connected");
-      const filter = this.config.topicFilter || "#";
-      client.subscribe(filter, { qos: this.config.qos }, (error, granted, packet) => {
-        const details: string[] = [];
+      const filters = this.getActiveFilters();
+      const allGranted: Array<{ topic: string; qos: number }> = [];
+      const allDetails: string[] = [];
+      let remaining = filters.length;
+
+      const onSubscribed = (
+        filter: string,
+        error: Error | null,
+        granted: Array<{ topic: string; qos: number }> | undefined,
+        packet: unknown,
+      ) => {
         const err = error as { message?: string; reasonCode?: number; reasonCodeKey?: string; code?: string } | null;
 
         if (granted && granted.length > 0) {
-          const summary = granted.map((item) => `${item.topic}:${item.qos}`).join(", ");
-          details.push(`granted:${summary}`);
+          allGranted.push(...granted);
           const rejected = granted.filter((item) => item.qos === 128);
-          if (rejected.length > 0) details.push("rejected:yes");
+          if (rejected.length > 0) allDetails.push(`rejected:${filter}`);
         } else if (!error) {
-          details.push("granted:none");
+          allDetails.push(`none:${filter}`);
         }
 
         if (err) {
-          if (err.reasonCode !== undefined) details.push(`rc:${err.reasonCode}`);
-          if (err.reasonCodeKey) details.push(`reason:${err.reasonCodeKey}`);
-          if (err.code) details.push(`code:${err.code}`);
+          if (err.reasonCode !== undefined) allDetails.push(`rc:${err.reasonCode}`);
+          if (err.reasonCodeKey) allDetails.push(`reason:${err.reasonCodeKey}`);
+          if (err.code) allDetails.push(`code:${err.code}`);
           const label = granted && granted.length > 0 ? "warn" : "error";
-          details.push(`${label}:${err.message || "Subscribe error"}`);
+          allDetails.push(`${label}:${err.message || "Subscribe error"}`);
         }
 
-        if (packet && "reasonCodes" in packet) {
+        if (packet && typeof packet === "object" && "reasonCodes" in packet) {
           const reasons = (packet as { reasonCodes?: number[] }).reasonCodes;
-          if (reasons && reasons.length > 0) details.push(`suback:${reasons.join(",")}`);
+          if (reasons && reasons.length > 0) allDetails.push(`suback:${reasons.join(",")}`);
         }
 
-        this.handlers.onSubscription(filter, details.join(" | ") || "subscribed");
-      });
+        remaining -= 1;
+        if (remaining === 0) {
+          const filterLabel = filters.join(", ");
+          const grantedSummary =
+            allGranted.length > 0
+              ? `granted:${allGranted.map((g) => `${g.topic}:${g.qos}`).join(", ")}`
+              : "granted:none";
+          const infoPrefix = filters.length > 1 ? `subscribed ${filters.length} filters` : "";
+          const parts = [infoPrefix, grantedSummary, ...allDetails].filter(Boolean);
+          this.handlers.onSubscription(filterLabel, parts.join(" | ") || "subscribed");
+        }
+      };
+
+      for (const filter of filters) {
+        client.subscribe(filter, { qos: this.config.qos }, (error, granted, packet) => {
+          onSubscribed(filter, error, granted, packet);
+        });
+      }
     });
 
     client.on("message", (topic, payload) => {

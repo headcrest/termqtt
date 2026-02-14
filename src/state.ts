@@ -4,7 +4,10 @@ export type BrokerConfig = {
   clientId: string;
   username: string;
   password: string;
+  /** Primary (first) topic filter — kept for backward compatibility */
   topicFilter: string;
+  /** Additional topic filters. When non-empty, all entries (including topicFilter) are subscribed. */
+  topicFilters: string[];
   defaultTopic: string;
   tls: boolean;
   qos: 0 | 1 | 2;
@@ -77,6 +80,7 @@ export const createDefaultBrokerConfig = (): BrokerConfig => ({
   username: "",
   password: "",
   topicFilter: "#",
+  topicFilters: [],
   defaultTopic: "",
   tls: false,
   qos: 0,
@@ -86,6 +90,9 @@ const resolveDefaultBrokerConfig = () => {
   const defaults = createDefaultBrokerConfig();
   const rootTopic = Bun.env.TERMOTTQ_ROOT_TOPIC || defaults.topicFilter;
   const port = Bun.env.TERMOTTQ_PORT ? Number(Bun.env.TERMOTTQ_PORT) : defaults.port;
+  const extraTopics = Bun.env.TERMOTTQ_EXTRA_TOPICS
+    ? Bun.env.TERMOTTQ_EXTRA_TOPICS.split(",").map((t) => t.trim()).filter((t) => t.length > 0)
+    : defaults.topicFilters;
   return {
     ...defaults,
     host: Bun.env.TERMOTTQ_BROKER || defaults.host,
@@ -94,6 +101,7 @@ const resolveDefaultBrokerConfig = () => {
     password: Bun.env.TERMOTTQ_PASSWORD || defaults.password,
     tls: Bun.env.TERMOTTQ_TLS === "true" || defaults.tls,
     topicFilter: rootTopic,
+    topicFilters: extraTopics,
     defaultTopic: rootTopic,
   };
 };
