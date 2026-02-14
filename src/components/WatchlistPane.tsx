@@ -1,5 +1,6 @@
 import type { SelectOption } from "@opentui/core";
 import { paneActiveBackground, paneInactiveBackground } from "../ui/paneTheme";
+import { selectMouseDown } from "../utils/mouseHandlers";
 
 type WatchlistPaneProps = {
   options: SelectOption[];
@@ -28,6 +29,7 @@ export const WatchlistPane = ({ options, selectedIndex, focused, count, onChange
           focused={focused}
           selectedIndex={Math.max(0, selectedIndex)}
           onChange={(index) => onChange(index)}
+          onMouseDown={selectMouseDown}
           backgroundColor={focused ? paneActiveBackground : paneInactiveBackground}
           focusedBackgroundColor={paneActiveBackground}
           selectedBackgroundColor={focused ? "#2d8cff" : paneInactiveBackground}

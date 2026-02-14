@@ -319,6 +319,7 @@ const AppContent = () => {
         onFavouriteChange={handleFavouriteChange}
         onFavouriteSelect={handleFavouriteSelect}
         onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index, activePane: "payload" } })}
+        onPayloadFocus={() => dispatch({ type: "set", data: { activePane: "payload" } })}
         onWatchChange={(index) => dispatch({ type: "set", data: { selectedWatchIndex: index, activePane: "watchlist" } })}
         detailsTitle={selectedMessage ? `Details (${selectedMessage.topic})` : "Details"}
         detailsContent={detailsContent.content}
