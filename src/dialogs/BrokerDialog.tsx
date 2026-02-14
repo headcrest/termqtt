@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { KeyEvent } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import type { BrokerConfig } from "../state";
+import { loadRecentBrokers, type RecentBrokerEntry } from "../storage";
 import { useDialog } from "./DialogContext";
 
 type BrokerDialogProps = {
@@ -13,6 +14,13 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
   const { closeDialog } = useDialog();
   const [broker, setBroker] = useState<BrokerConfig>(initialBroker);
   const [focusIndex, setFocusIndex] = useState(0);
+  const [recentBrokers, setRecentBrokers] = useState<RecentBrokerEntry[]>([]);
+  const [recentIndex, setRecentIndex] = useState(-1);
+  const [showingRecents, setShowingRecents] = useState(false);
+
+  useEffect(() => {
+    loadRecentBrokers().then(setRecentBrokers).catch(() => setRecentBrokers([]));
+  }, []);
 
   const fields = useMemo(
     () => [
@@ -58,9 +66,27 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
     [broker],
   );
 
+  const applyRecent = useCallback(
+    (entry: RecentBrokerEntry) => {
+      setBroker((prev) => ({
+        ...prev,
+        host: entry.host,
+        port: entry.port,
+        username: entry.username,
+        tls: entry.tls,
+        topicFilter: entry.topicFilter,
+        defaultTopic: entry.topicFilter,
+      }));
+      setShowingRecents(false);
+      setFocusIndex(0);
+    },
+    [],
+  );
+
   const handleKey = useCallback(
     (key: KeyEvent) => {
       if (!key) return false;
+
       const isShiftTab =
         key.name === "backtab" ||
         (key.name === "tab" && key.shift) ||
@@ -69,10 +95,40 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
         key.sequence === "[Z" ||
         (key.sequence ? key.sequence.endsWith("[Z") : false);
       const isTab = key.name === "tab" || key.name === "teb" || key.sequence === "\t" || key.sequence === "\u0009";
+
       if (key.name === "escape") {
+        if (showingRecents) {
+          setShowingRecents(false);
+          return true;
+        }
         closeDialog();
         return true;
       }
+
+      // Toggle recents panel with Ctrl+r
+      if (key.ctrl && key.name === "r") {
+        setShowingRecents((prev) => !prev);
+        if (recentBrokers.length > 0) setRecentIndex(0);
+        return true;
+      }
+
+      if (showingRecents) {
+        if (key.name === "j" || key.name === "down") {
+          setRecentIndex((prev) => Math.min(recentBrokers.length - 1, prev + 1));
+          return true;
+        }
+        if (key.name === "k" || key.name === "up") {
+          setRecentIndex((prev) => Math.max(0, prev - 1));
+          return true;
+        }
+        if (key.name === "return" && recentIndex >= 0) {
+          const entry = recentBrokers[recentIndex];
+          if (entry) applyRecent(entry);
+          return true;
+        }
+        return true;
+      }
+
       if (isShiftTab) {
         setFocusIndex((prev) => (prev - 1 + fields.length) % fields.length);
         return true;
@@ -91,12 +147,18 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
       }
       return false;
     },
-    [broker, closeDialog, fields.length, onSave],
+    [broker, closeDialog, fields.length, onSave, recentBrokers, recentIndex, showingRecents, applyRecent],
   );
 
   useKeyboard((key) => {
     handleKey(key);
   });
+
+  const recentOptions = recentBrokers.map((b, i) => ({
+    selected: i === recentIndex,
+    label: b.label,
+    detail: b.username ? `user:${b.username} topic:${b.topicFilter}` : `topic:${b.topicFilter}`,
+  }));
 
   return (
     <box
@@ -105,9 +167,9 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
       style={{
         position: "absolute",
         width: "70%",
-        height: "70%",
+        height: showingRecents && recentBrokers.length > 0 ? "85%" : "70%",
         left: "15%",
-        top: "10%",
+        top: "5%",
         borderStyle: "double",
         borderColor: "#3b82f6",
         backgroundColor: "#0c1019",
@@ -139,7 +201,7 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
                 <input
                   value={field.value}
                   onInput={field.set}
-                  focused={focusIndex === index}
+                  focused={!showingRecents && focusIndex === index}
                   style={{ focusedBackgroundColor: "#111827" }}
                 />
               </box>
@@ -147,8 +209,49 @@ export const BrokerDialog = ({ initialBroker, onSave }: BrokerDialogProps) => {
           ))}
         </box>
       </scrollbox>
+
+      {showingRecents && recentBrokers.length > 0 && (
+        <box
+          title="Recent Brokers (j/k navigate • Enter select • Esc close)"
+          border
+          style={{
+            height: Math.min(recentBrokers.length + 4, 10),
+            borderColor: "#3b82f6",
+            flexDirection: "column",
+          }}
+        >
+          {recentOptions.map((opt, i) => (
+            <box
+              key={opt.label + String(i)}
+              style={{
+                flexDirection: "row",
+                gap: 1,
+                paddingLeft: 1,
+                backgroundColor: opt.selected ? "#1e3a5f" : undefined,
+              }}
+            >
+              <text
+                content={opt.selected ? `▶ ${opt.label}` : `  ${opt.label}`}
+                fg={opt.selected ? "#60a5fa" : "#e2e8f0"}
+              />
+              <text content={`  ${opt.detail}`} fg="#64748b" />
+            </box>
+          ))}
+        </box>
+      )}
+
+      {showingRecents && recentBrokers.length === 0 && (
+        <box style={{ paddingLeft: 1 }}>
+          <text content="No recent brokers saved yet." fg="#64748b" />
+        </box>
+      )}
+
       <text
-        content="Tab/Shift+Tab fields • Enter save • Esc close"
+        content={
+          showingRecents
+            ? "j/k navigate • Enter select • Esc close recents"
+            : `Tab/Shift+Tab fields • Enter save • Esc close${recentBrokers.length > 0 ? " • Ctrl+r recent brokers" : ""}`
+        }
         fg="#94a3b8"
       />
     </box>

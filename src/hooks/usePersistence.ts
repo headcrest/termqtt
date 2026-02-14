@@ -1,5 +1,5 @@
 import { useEffect, useRef, type Dispatch } from "react";
-import { loadAll, saveAll } from "../storage";
+import { loadAll, saveAll, saveRecentBroker } from "../storage";
 import type { Action } from "../app/reducer";
 import type { AppState, BrokerConfig, ExcludeFilter, Favourite, SavedMessage, WatchEntry } from "../state";
 
@@ -83,6 +83,14 @@ export const usePersistence = (state: AppState, dispatch: Dispatch<Action>) => {
         savedMessages: state.savedMessages,
         excludeFilters: state.excludeFilters,
       }, state.broker);
+      void saveRecentBroker({
+        host: state.broker.host,
+        port: state.broker.port,
+        username: state.broker.username,
+        tls: state.broker.tls,
+        topicFilter: state.broker.topicFilter,
+        label: `${state.broker.host}:${state.broker.port}`,
+      });
     }, 250);
   }, [state.broker, state.favourites, state.watchlist, state.savedMessages, state.excludeFilters]);
 };
