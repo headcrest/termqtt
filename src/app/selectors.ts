@@ -150,7 +150,8 @@ export const getWatchOptions = (state: AppState) => {
 
 export const getStatusLine = (state: AppState) => {
   const status = state.connectionStatus.toUpperCase();
-  const host = `${state.broker.host}:${state.broker.port}`;
+  const extraCount = (state.broker.topicFilters ?? []).filter((f) => f.trim().length > 0).length;
+  const topicLabel = extraCount > 0 ? `${state.broker.host}:${state.broker.port} (${1 + extraCount} topics)` : `${state.broker.host}:${state.broker.port}`;
   const searchActive = state.searchQuery.trim().length > 0;
   const search = searchActive ? `search:${state.searchQuery}` : "search:off";
   const excludesCount = state.excludeFilters.filter((f) => f.enabled).length;
@@ -159,7 +160,7 @@ export const getStatusLine = (state: AppState) => {
   const debug = state.debugKeys && state.lastKeyDebug ? `key:${state.lastKeyDebug}` : "";
   return {
     status,
-    host,
+    host: topicLabel,
     search,
     searchActive,
     excludes,
