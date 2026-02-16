@@ -10,6 +10,7 @@ export const storageFiles = {
   favourites: "termqtt_favourites.json",
   savedMessages: "termqtt_saved_messages.json",
   filters: "termqtt_filters.json",
+  recentBrokers: "termqtt_recent_brokers.json",
 };
 
 export const getConfigDir = () => {
@@ -109,4 +110,28 @@ export const saveAll = async (data: PersistedState, brokerScope: { host: string;
     saveJson(scopedFile(prefix, storageFiles.savedMessages), data.savedMessages),
     saveJson(scopedFile(prefix, storageFiles.filters), data.excludeFilters),
   ]);
+};
+
+export const MAX_RECENT_BROKERS = 5;
+
+export type RecentBrokerEntry = {
+  host: string;
+  port: number;
+  username: string;
+  tls: boolean;
+  topicFilter: string;
+  label: string;
+};
+
+export const loadRecentBrokers = async (): Promise<RecentBrokerEntry[]> => {
+  return loadJson<RecentBrokerEntry[]>(storageFiles.recentBrokers, []);
+};
+
+export const saveRecentBroker = async (entry: RecentBrokerEntry): Promise<void> => {
+  const existing = await loadRecentBrokers();
+  const filtered = existing.filter(
+    (b) => !(b.host === entry.host && b.port === entry.port),
+  );
+  const updated = [entry, ...filtered].slice(0, MAX_RECENT_BROKERS);
+  await saveJson(storageFiles.recentBrokers, updated);
 };
