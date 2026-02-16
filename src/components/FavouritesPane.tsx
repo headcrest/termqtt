@@ -1,5 +1,6 @@
 import type { SelectOption } from "@opentui/core";
 import { paneActiveBackground, paneInactiveBackground } from "../ui/paneTheme";
+import { selectMouseDown } from "../utils/mouseHandlers";
 
 type FavouritesPaneProps = {
   options: SelectOption[];
@@ -37,6 +38,7 @@ export const FavouritesPane = ({
           selectedIndex={Math.max(0, selectedIndex)}
           onChange={(index) => onChange(index)}
           onSelect={(index) => onSelect(index)}
+          onMouseDown={selectMouseDown}
           backgroundColor={focused ? paneActiveBackground : paneInactiveBackground}
           focusedBackgroundColor={paneActiveBackground}
           selectedBackgroundColor={focused ? "#2d8cff" : paneInactiveBackground}

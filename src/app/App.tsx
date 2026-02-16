@@ -171,7 +171,7 @@ const AppContent = () => {
   const handleFavouriteChange = (index: number) => {
     const fav = state.favourites[index];
     if (!fav) {
-      dispatch({ type: "set", data: { selectedFavouriteIndex: index } });
+      dispatch({ type: "set", data: { selectedFavouriteIndex: index, activePane: "favourites" } });
       return;
     }
     const topicIndex = topicTree.topicPaths.indexOf(fav.topic);
@@ -182,6 +182,7 @@ const AppContent = () => {
           selectedFavouriteIndex: index,
           selectedTopicIndex: topicIndex,
           selectedPayloadIndex: 0,
+          activePane: "favourites",
         },
       });
       return;
@@ -205,6 +206,7 @@ const AppContent = () => {
         selectedTopicIndex: nextIndex >= 0 ? nextIndex : state.selectedTopicIndex,
         selectedPayloadIndex: nextIndex >= 0 ? 0 : state.selectedPayloadIndex,
         topicExpansion: nextExpansion,
+        activePane: "favourites",
       },
     });
   };
@@ -311,13 +313,14 @@ const AppContent = () => {
         selectedPayloadIndex={state.selectedPayloadIndex}
         selectedWatchIndex={state.selectedWatchIndex}
         onTopicChange={(index) =>
-          dispatch({ type: "set", data: { selectedTopicIndex: index, selectedPayloadIndex: 0 } })
+          dispatch({ type: "set", data: { selectedTopicIndex: index, selectedPayloadIndex: 0, activePane: "topics" } })
         }
         onTopicSelect={handleTopicSelect}
         onFavouriteChange={handleFavouriteChange}
         onFavouriteSelect={handleFavouriteSelect}
-        onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index } })}
-        onWatchChange={(index) => dispatch({ type: "set", data: { selectedWatchIndex: index } })}
+        onPayloadChange={(index) => dispatch({ type: "set", data: { selectedPayloadIndex: index, activePane: "payload" } })}
+        onPayloadFocus={() => dispatch({ type: "set", data: { activePane: "payload" } })}
+        onWatchChange={(index) => dispatch({ type: "set", data: { selectedWatchIndex: index, activePane: "watchlist" } })}
         detailsTitle={selectedMessage ? `Details (${selectedMessage.topic})` : "Details"}
         detailsContent={detailsContent.content}
         detailsIsJson={detailsContent.isJson}

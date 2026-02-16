@@ -25,6 +25,7 @@ type PaneLayoutProps = {
   onFavouriteChange: (index: number) => void;
   onFavouriteSelect: (index: number) => void;
   onPayloadChange: (index: number) => void;
+  onPayloadFocus: () => void;
   onWatchChange: (index: number) => void;
   detailsTitle: string;
   detailsContent: string;
@@ -50,6 +51,7 @@ export const PaneLayout = ({
   onFavouriteChange,
   onFavouriteSelect,
   onPayloadChange,
+  onPayloadFocus,
   onWatchChange,
   detailsTitle,
   detailsContent,
@@ -75,6 +77,7 @@ export const PaneLayout = ({
             focused={activePane === "payload"}
             count={payloadCount}
             onChange={onPayloadChange}
+            onFocus={onPayloadFocus}
           />
         </box>
         <box style={{ flexGrow: 1 }}>

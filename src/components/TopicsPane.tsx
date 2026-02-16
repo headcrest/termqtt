@@ -1,5 +1,6 @@
 import type { SelectOption } from "@opentui/core";
 import { paneActiveBackground } from "../ui/paneTheme";
+import { selectMouseDown } from "../utils/mouseHandlers";
 
 type TopicsPaneProps = {
   options: SelectOption[];
@@ -34,6 +35,7 @@ export const TopicsPane = ({
         selectedIndex={selectedIndex}
         onChange={(index) => onChange(index)}
         onSelect={(index) => onSelect(index)}
+        onMouseDown={selectMouseDown}
         showDescription={false}
         backgroundColor={focused ? paneActiveBackground : undefined}
         focusedBackgroundColor={paneActiveBackground}

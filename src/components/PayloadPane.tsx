@@ -14,6 +14,10 @@ type PayloadPaneProps = {
   focused: boolean;
   count: number;
   onChange: (index: number) => void;
+  /** Called when the scrollbox receives a mouseDown event (i.e. the user clicks
+   *  anywhere in this pane). Use this to update activePane in React state so the
+   *  focus does not get reverted on the next render. */
+  onFocus?: () => void;
 };
 
 const getValueColor = (type: string) => {
@@ -48,7 +52,7 @@ const formatKeyCell = (path: string, width: number) => {
   return path.padEnd(width, " ");
 };
 
-export const PayloadPane = ({ entries, selectedIndex, focused, count, onChange }: PayloadPaneProps) => {
+export const PayloadPane = ({ entries, selectedIndex, focused, count, onChange, onFocus }: PayloadPaneProps) => {
   const maxPathLength = entries.reduce((max, entry) => Math.max(max, entry.path.length), 0);
   const keyWidth = Math.min(40, Math.max(10, maxPathLength));
 
@@ -67,7 +71,20 @@ export const PayloadPane = ({ entries, selectedIndex, focused, count, onChange }
           <text content={formatKeyCell("Key", keyWidth)} fg={focused ? "#94a3b8" : "#ffffff"} />
           <text content="Value" fg={focused ? "#94a3b8" : "#ffffff"} />
         </box>
-        <scrollbox style={{ flexGrow: 1, width: "100%" }} scrollY focused={focused}>
+        {/*
+         * onMouseDown fires before React re-renders, so we can update activePane
+         * immediately. This prevents the race where opentui auto-focuses the
+         * scrollbox but React then re-renders with focused={false} and blurs it.
+         * Must be a regular function (not arrow) so opentui's .call(this, event)
+         * binding works correctly — but here we don't need `this`, so either
+         * form is fine; we use function syntax for consistency.
+         */}
+        <scrollbox
+          style={{ flexGrow: 1, width: "100%" }}
+          scrollY
+          focused={focused}
+          onMouseDown={onFocus ? function () { onFocus(); } : undefined}
+        >
           <box style={{ flexDirection: "column", gap: 0 }}>
             {entries.map((entry, index) => {
               const selected = index === selectedIndex;
