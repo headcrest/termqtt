@@ -49,8 +49,13 @@ export class MqttManager {
 
     client.on("connect", () => {
       this.handlers.onStatus("connected");
-      const filter = this.config.topicFilter || "#";
-      client.subscribe(filter, { qos: this.config.qos }, (error, granted, packet) => {
+      const filterStr = this.config.topicFilter?.trim() || "#";
+      const filters = filterStr.includes(",") 
+        ? filterStr.split(",").map((f) => f.trim()).filter((f) => f.length > 0) 
+        : filterStr;
+      const finalFilter = Array.isArray(filters) && filters.length === 0 ? "#" : filters;
+      
+      client.subscribe(finalFilter, { qos: this.config.qos }, (error, granted, packet) => {
         const details: string[] = [];
         const err = error as { message?: string; reasonCode?: number; reasonCodeKey?: string; code?: string } | null;
 
@@ -76,7 +81,8 @@ export class MqttManager {
           if (reasons && reasons.length > 0) details.push(`suback:${reasons.join(",")}`);
         }
 
-        this.handlers.onSubscription(filter, details.join(" | ") || "subscribed");
+        const filterDisplay = Array.isArray(finalFilter) ? finalFilter.join(",") : finalFilter;
+        this.handlers.onSubscription(filterDisplay, details.join(" | ") || "subscribed");
       });
     });
 
